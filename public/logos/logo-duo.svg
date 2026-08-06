@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" fill="none">
+  
+  
+    <g transform="translate(200 130)"><g transform="scale(0.95)"><g transform="rotate(0)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="5.2" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.4" stroke-linecap="round"/>
+    </g>
+<g transform="rotate(45)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="5.2" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.4" stroke-linecap="round"/>
+    </g>
+<g transform="rotate(90)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="5.2" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.4" stroke-linecap="round"/>
+    </g>
+<g transform="rotate(135)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="5.2" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.4" stroke-linecap="round"/>
+    </g>
+<g transform="rotate(180)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="5.2" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.4" stroke-linecap="round"/>
+    </g>
+<g transform="rotate(225)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="5.2" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.4" stroke-linecap="round"/>
+    </g>
+<g transform="rotate(270)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="5.2" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.4" stroke-linecap="round"/>
+    </g>
+<g transform="rotate(315)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="5.2" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.4" stroke-linecap="round"/>
+    </g><circle cx="34.44" cy="-83.15" r="4.2" fill="#2EC4D4"/>
+<circle cx="83.15" cy="-34.44" r="4.2" fill="#2EC4D4"/>
+<circle cx="83.15" cy="34.44" r="4.2" fill="#2EC4D4"/>
+<circle cx="34.44" cy="83.15" r="4.2" fill="#2EC4D4"/>
+<circle cx="-34.44" cy="83.15" r="4.2" fill="#2EC4D4"/>
+<circle cx="-83.15" cy="34.44" r="4.2" fill="#2EC4D4"/>
+<circle cx="-83.15" cy="-34.44" r="4.2" fill="#2EC4D4"/>
+<circle cx="-34.44" cy="-83.15" r="4.2" fill="#2EC4D4"/></g></g>
+    <text x="200" y="290" text-anchor="middle"
+      font-family="Arial Black, Helvetica Neue, Arial, sans-serif" font-size="34" font-weight="900"
+      letter-spacing="1.5">
+      <tspan fill="#FFFFFF">ÓTICAS </tspan><tspan fill="#2EC4D4">LÍRIO</tspan>
+    </text>
+    <text x="200" y="328" text-anchor="middle" fill="#2EC4D4"
+      font-family="Brush Script MT, Snell Roundhand, cursive" font-size="22" font-style="italic">
+      Um amor por cada óculos!
+    </text>
+  
+</svg>

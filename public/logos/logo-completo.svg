@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" fill="none">
+  
+  
+    <circle cx="200" cy="200" r="188" fill="none" stroke="#2EC4D4" stroke-width="5.5"/>
+    <g transform="translate(200 118)"><g transform="scale(0.72)"><g transform="rotate(0)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="4.6" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.1" stroke-linecap="round"/>
+    </g>
+<g transform="rotate(45)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="4.6" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.1" stroke-linecap="round"/>
+    </g>
+<g transform="rotate(90)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="4.6" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.1" stroke-linecap="round"/>
+    </g>
+<g transform="rotate(135)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="4.6" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.1" stroke-linecap="round"/>
+    </g>
+<g transform="rotate(180)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="4.6" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.1" stroke-linecap="round"/>
+    </g>
+<g transform="rotate(225)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="4.6" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.1" stroke-linecap="round"/>
+    </g>
+<g transform="rotate(270)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="4.6" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.1" stroke-linecap="round"/>
+    </g>
+<g transform="rotate(315)">
+      <path d="M 0 -82 C 20 -68 26 -38 18 -18 C 12 -6 4 2 0 4 C -4 2 -12 -6 -18 -18 C -26 -38 -20 -68 0 -82 Z" fill="none" stroke="#2EC4D4" stroke-width="4.6" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="0" y1="-76" x2="0" y2="-8" stroke="#2EC4D4" stroke-width="2.1" stroke-linecap="round"/>
+    </g><circle cx="34.44" cy="-83.15" r="3.6" fill="#2EC4D4"/>
+<circle cx="83.15" cy="-34.44" r="3.6" fill="#2EC4D4"/>
+<circle cx="83.15" cy="34.44" r="3.6" fill="#2EC4D4"/>
+<circle cx="34.44" cy="83.15" r="3.6" fill="#2EC4D4"/>
+<circle cx="-34.44" cy="83.15" r="3.6" fill="#2EC4D4"/>
+<circle cx="-83.15" cy="34.44" r="3.6" fill="#2EC4D4"/>
+<circle cx="-83.15" cy="-34.44" r="3.6" fill="#2EC4D4"/>
+<circle cx="-34.44" cy="-83.15" r="3.6" fill="#2EC4D4"/></g></g>
+    <text x="200" y="228" text-anchor="middle" fill="#2EC4D4"
+      font-family="Arial Black, Helvetica Neue, Arial, sans-serif" font-size="34" font-weight="900"
+      letter-spacing="1.5">ÓTICAS LÍRIO</text>
+    
+    <text x="200" y="268" text-anchor="middle" fill="#2EC4D4"
+      font-family="Brush Script MT, Snell Roundhand, cursive" font-size="22" font-style="italic">
+      Um amor por cada óculos!
+    </text>
+    <path d="M 95 280 Q 200 292 290 278" fill="none" stroke="#2EC4D4" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M 292 274 C 296 268 304 268 306 274 C 308 268 316 268 320 274 C 320 282 306 292 306 292 C 306 292 292 282 292 274 Z" fill="#2EC4D4"/>
+  
+  
+</svg>
