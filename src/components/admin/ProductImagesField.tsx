@@ -5,6 +5,8 @@ import { useId, useRef, useState, useTransition } from "react";
 type Props = {
   initialImages?: string[];
   nameKept?: string;
+  /** Exige ao menos uma foto (criação de produto). */
+  required?: boolean;
 };
 
 type PendingFile = {
@@ -20,6 +22,7 @@ type Slot =
 export function ProductImagesField({
   initialImages = [],
   nameKept = "keptImages",
+  required = false,
 }: Props) {
   const galleryId = useId();
   const cameraId = useId();
@@ -84,10 +87,21 @@ export function ProductImagesField({
 
   return (
     <div className="space-y-3">
-      <p className="text-sm font-medium text-brand-ink">Fotos do produto</p>
+      <p className="text-sm font-medium text-brand-ink">
+        Fotos do produto{required ? " *" : ""}
+      </p>
       <p className="text-xs text-ink-muted">
-        A primeira foto é a <strong>capa</strong> (catálogo e destaque no
-        detalhe). Use “Usar como capa” nas outras.
+        {required ? (
+          <>
+            Obrigatório: ao menos <strong>uma foto</strong>. A primeira é a{" "}
+            <strong>capa</strong> (catálogo e detalhe).
+          </>
+        ) : (
+          <>
+            A primeira foto é a <strong>capa</strong> (catálogo e destaque no
+            detalhe). Use “Usar como capa” nas outras.
+          </>
+        )}
       </p>
 
       {keptOrdered.map((url) => (
@@ -189,8 +203,16 @@ export function ProductImagesField({
       />
 
       {slots.length === 0 ? (
-        <p className="rounded-xl bg-sand/80 px-3 py-2 text-xs text-ink-muted">
-          Nenhuma foto ainda. Sem foto, o site usa um placeholder.
+        <p
+          className={`rounded-xl px-3 py-2 text-xs ${
+            required
+              ? "bg-amber-50 text-amber-900"
+              : "bg-sand/80 text-ink-muted"
+          }`}
+        >
+          {required
+            ? "Adicione ao menos uma foto para cadastrar o produto."
+            : "Nenhuma foto ainda. Sem foto, o site usa um placeholder."}
         </p>
       ) : null}
     </div>
@@ -234,10 +256,19 @@ type FormProps = {
   action: (formData: FormData) => Promise<void>;
   children: React.ReactNode;
   className?: string;
+  submitLabel?: string;
+  requireImages?: boolean;
 };
 
-export function ProductFormShell({ action, children, className }: FormProps) {
+export function ProductFormShell({
+  action,
+  children,
+  className,
+  submitLabel,
+  requireImages = false,
+}: FormProps) {
   const [pending, startTransition] = useTransition();
+  const [clientError, setClientError] = useState<string | null>(null);
 
   return (
     <form
@@ -253,13 +284,51 @@ export function ProductFormShell({ action, children, className }: FormProps) {
           fd.append("photos", file);
         }
         fd.set("coverPending", form.__coverPending ? "1" : "0");
+
+        if (requireImages) {
+          const kept = fd
+            .getAll("keptImages")
+            .map((v) => String(v).trim())
+            .filter(Boolean);
+          const pendingPhotos = form.__pendingPhotos || [];
+          if (kept.length === 0 && pendingPhotos.length === 0) {
+            setClientError("Adicione ao menos uma foto do produto.");
+            return;
+          }
+        }
+
+        setClientError(null);
         startTransition(async () => {
           await action(fd);
         });
       }}
     >
       {children}
-      {pending ? (
+      {clientError ? (
+        <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">
+          {clientError}
+        </p>
+      ) : null}
+      {submitLabel ? (
+        <button
+          type="submit"
+          disabled={pending}
+          className="btn btn-primary disabled:opacity-70"
+          aria-busy={pending}
+        >
+          {pending ? (
+            <span className="inline-flex items-center gap-2">
+              <span
+                className="inline-block size-4 animate-spin rounded-full border-2 border-current border-r-transparent"
+                aria-hidden
+              />
+              Salvando…
+            </span>
+          ) : (
+            submitLabel
+          )}
+        </button>
+      ) : pending ? (
         <p className="text-sm text-ink-muted">Salvando…</p>
       ) : null}
     </form>

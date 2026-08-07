@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductGallery } from "@/components/ProductGallery";
+import { decodeProductIdParam } from "@/lib/admin/productId";
 import {
   categoryLabels,
   formatPrice,
@@ -24,7 +25,8 @@ export async function generateMetadata({
 }: {
   params: Params;
 }): Promise<Metadata> {
-  const { id } = await params;
+  const { id: rawId } = await params;
+  const id = decodeProductIdParam(rawId);
   const product = await getProductById(id);
   if (!product) return { title: "Produto" };
   return {
@@ -38,7 +40,8 @@ export default async function ProdutoDetalhePage({
 }: {
   params: Params;
 }) {
-  const { id } = await params;
+  const { id: rawId } = await params;
+  const id = decodeProductIdParam(rawId);
   const product = await getProductById(id);
   if (!product) notFound();
   const title = productDisplayName(product.name, product.brand);

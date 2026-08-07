@@ -2,6 +2,11 @@
 
 import { requirePermission } from "@/lib/admin/auth";
 import { translateAdminError } from "@/lib/admin/errors";
+import {
+  adminProductPath,
+  catalogProductPath,
+  slugifyProductId,
+} from "@/lib/admin/productId";
 import { parseBRLCurrency } from "@/lib/format";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { ProductCategory, ProductShape } from "@/types/product";
@@ -24,16 +29,6 @@ function failProduto(path: string, message: string): never {
   redirect(`${path}?erro=${encodeURIComponent(translateAdminError(message))}`);
 }
 
-function slugify(text: string) {
-  return text
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
-    .slice(0, 48);
-}
-
 function extensionFor(file: File) {
   const fromName = file.name.split(".").pop()?.toLowerCase();
   if (fromName && fromName.length <= 5) return fromName;
@@ -50,9 +45,19 @@ function storagePathFromPublicUrl(url: string): string | null {
   return decodeURIComponent(url.slice(idx + marker.length));
 }
 
+function parseOptionalMm(raw: FormDataEntryValue | null): number | null {
+  const s = String(raw ?? "")
+    .trim()
+    .replace(",", ".");
+  if (!s) return null;
+  const n = Number(s);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return Math.round(n * 10) / 10;
+}
+
 function parseProductFields(formData: FormData) {
   const name = String(formData.get("name") || "").trim();
-  const brand = String(formData.get("brand") || "Óticas Lírio").trim();
+  const brand = String(formData.get("brand") || "").trim();
   const category = String(formData.get("category") || "grau") as ProductCategory;
   const shape = String(formData.get("shape") || "outro") as ProductShape;
   const material = String(formData.get("material") || "").trim();
@@ -65,6 +70,7 @@ function parseProductFields(formData: FormData) {
     .filter(Boolean);
   const inStock = formData.get("inStock") === "on";
   const featured = formData.get("featured") === "on";
+  const sku = String(formData.get("sku") || "").trim() || null;
 
   return {
     name,
@@ -77,6 +83,11 @@ function parseProductFields(formData: FormData) {
     colors,
     in_stock: inStock,
     featured,
+    sku,
+    lens_width_mm: parseOptionalMm(formData.get("lensWidthMm")),
+    bridge_mm: parseOptionalMm(formData.get("bridgeMm")),
+    temple_mm: parseOptionalMm(formData.get("templeMm")),
+    frame_width_mm: parseOptionalMm(formData.get("frameWidthMm")),
   };
 }
 
@@ -120,6 +131,7 @@ async function resolveImages(
   productId: string,
   formData: FormData,
   previousImages: string[] = [],
+  options: { requireAtLeastOne?: boolean } = {},
 ): Promise<string[]> {
   const kept = formData
     .getAll("keptImages")
@@ -160,10 +172,14 @@ async function resolveImages(
     await supabase.storage.from(BUCKET).remove(paths);
   }
 
-  if (next.length === 0) {
+  const real = next.filter((url) => !url.includes("placeholder-"));
+  if (real.length === 0) {
+    if (options.requireAtLeastOne) {
+      throw new Error("foto");
+    }
     return ["/products/placeholder-aviador.svg"];
   }
-  return next;
+  return real;
 }
 
 export async function createProductAction(formData: FormData) {
@@ -172,18 +188,24 @@ export async function createProductAction(formData: FormData) {
   if (!supabase) failProduto("/admin/produtos/novo", "config");
 
   const fields = parseProductFields(formData);
-  if (!fields.name || !fields.material || Number.isNaN(fields.price)) {
+  if (!fields.name || !fields.brand || !fields.material || Number.isNaN(fields.price)) {
     failProduto("/admin/produtos/novo", "campos");
   }
 
   const customId = String(formData.get("id") || "").trim();
-  const id =
-    customId ||
-    `lirio-${slugify(fields.name)}-${Date.now().toString(36).slice(-4)}`;
+  const id = customId
+    ? slugifyProductId(customId)
+    : `lirio-${slugifyProductId(fields.name)}-${Date.now().toString(36).slice(-4)}`;
+
+  if (!id) {
+    failProduto("/admin/produtos/novo", "id-invalido");
+  }
 
   let images: string[];
   try {
-    images = await resolveImages(supabase, id, formData);
+    images = await resolveImages(supabase, id, formData, [], {
+      requireAtLeastOne: true,
+    });
   } catch (e) {
     failProduto(
       "/admin/produtos/novo",
@@ -217,8 +239,8 @@ export async function updateProductAction(formData: FormData) {
   if (!id) failProduto("/admin/produtos", "id");
 
   const fields = parseProductFields(formData);
-  if (!fields.name || !fields.material || Number.isNaN(fields.price)) {
-    failProduto(`/admin/produtos/${id}`, "campos");
+  if (!fields.name || !fields.brand || !fields.material || Number.isNaN(fields.price)) {
+    failProduto(adminProductPath(id), "campos");
   }
 
   const { data: current } = await supabase
@@ -234,7 +256,7 @@ export async function updateProductAction(formData: FormData) {
     images = await resolveImages(supabase, id, formData, previousImages);
   } catch (e) {
     failProduto(
-      `/admin/produtos/${id}`,
+      adminProductPath(id),
       e instanceof Error ? e.message : "falha",
     );
   }
@@ -245,13 +267,13 @@ export async function updateProductAction(formData: FormData) {
     .eq("id", id);
 
   if (error) {
-    failProduto(`/admin/produtos/${id}`, error.message);
+    failProduto(adminProductPath(id), error.message);
   }
 
   revalidateTag("products", "max");
   revalidatePath("/");
   revalidatePath("/produtos");
-  revalidatePath(`/produtos/${id}`);
+  revalidatePath(catalogProductPath(id));
   revalidatePath("/admin/produtos");
   redirect("/admin/produtos?ok=salvo");
 }
@@ -312,5 +334,5 @@ export async function toggleStockAction(formData: FormData) {
   revalidateTag("products", "max");
   revalidatePath("/admin/produtos");
   revalidatePath("/produtos");
-  revalidatePath(`/produtos/${id}`);
+  revalidatePath(catalogProductPath(id));
 }

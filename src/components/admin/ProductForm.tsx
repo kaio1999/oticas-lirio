@@ -26,9 +26,13 @@ type Props = {
 };
 
 export function ProductForm({ action, product, submitLabel, error }: Props) {
+  const isCreate = !product;
+
   return (
     <ProductFormShell
       action={action}
+      submitLabel={submitLabel}
+      requireImages={isCreate}
       className="space-y-5 rounded-2xl border border-line bg-white p-6"
     >
       <AdminFlash
@@ -45,8 +49,14 @@ export function ProductForm({ action, product, submitLabel, error }: Props) {
           <input
             name="id"
             placeholder="ex: lirio-aviador-13"
+            pattern="[A-Za-z0-9\-]+"
+            title="Use apenas letras, números e hífens — sem espaços"
             className="mt-1.5 w-full rounded-xl border border-line px-3 py-2.5"
           />
+          <span className="mt-1 block text-xs text-ink-muted">
+            Sem espaços. Se tiver espaço ou acento, vira hífen automaticamente
+            (ex.: “teste 123” → “teste-123”).
+          </span>
         </label>
       ) : null}
 
@@ -62,10 +72,12 @@ export function ProductForm({ action, product, submitLabel, error }: Props) {
         </label>
 
         <label className="block text-sm font-medium">
-          Marca
+          Marca *
           <input
             name="brand"
-            defaultValue={product?.brand || "Óticas Lírio"}
+            required
+            defaultValue={product?.brand ?? ""}
+            placeholder="Ex.: Ray-Ban, Oakley…"
             className="mt-1.5 w-full rounded-xl border border-line px-3 py-2.5"
           />
         </label>
@@ -145,7 +157,85 @@ export function ProductForm({ action, product, submitLabel, error }: Props) {
         />
       </label>
 
-      <ProductImagesField initialImages={product?.images ?? []} />
+      <fieldset className="space-y-4 rounded-2xl border border-dashed border-line bg-sand/30 p-4">
+        <legend className="px-1 text-sm font-medium text-brand-ink">
+          Uso interno (não aparece no site)
+        </legend>
+        <p className="text-xs text-ink-muted">
+          SKU e medidas em mm — só a equipe vê no admin. Útil para estoque e
+          futuro espelho digital.
+        </p>
+
+        <label className="block text-sm font-medium">
+          SKU (opcional)
+          <input
+            name="sku"
+            defaultValue={product?.sku ?? ""}
+            placeholder="Ex.: RB-2140-50"
+            className="mt-1.5 w-full rounded-xl border border-line bg-white px-3 py-2.5"
+          />
+        </label>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <label className="block text-sm font-medium">
+            Lente (mm)
+            <input
+              name="lensWidthMm"
+              type="number"
+              min={0}
+              step="0.1"
+              inputMode="decimal"
+              defaultValue={product?.lensWidthMm ?? ""}
+              placeholder="50"
+              className="mt-1.5 w-full rounded-xl border border-line bg-white px-3 py-2.5"
+            />
+          </label>
+          <label className="block text-sm font-medium">
+            Ponte (mm)
+            <input
+              name="bridgeMm"
+              type="number"
+              min={0}
+              step="0.1"
+              inputMode="decimal"
+              defaultValue={product?.bridgeMm ?? ""}
+              placeholder="18"
+              className="mt-1.5 w-full rounded-xl border border-line bg-white px-3 py-2.5"
+            />
+          </label>
+          <label className="block text-sm font-medium">
+            Haste (mm)
+            <input
+              name="templeMm"
+              type="number"
+              min={0}
+              step="0.1"
+              inputMode="decimal"
+              defaultValue={product?.templeMm ?? ""}
+              placeholder="140"
+              className="mt-1.5 w-full rounded-xl border border-line bg-white px-3 py-2.5"
+            />
+          </label>
+          <label className="block text-sm font-medium">
+            Largura total (mm)
+            <input
+              name="frameWidthMm"
+              type="number"
+              min={0}
+              step="0.1"
+              inputMode="decimal"
+              defaultValue={product?.frameWidthMm ?? ""}
+              placeholder="140"
+              className="mt-1.5 w-full rounded-xl border border-line bg-white px-3 py-2.5"
+            />
+          </label>
+        </div>
+      </fieldset>
+
+      <ProductImagesField
+        initialImages={product?.images ?? []}
+        required={isCreate}
+      />
 
       <div className="flex flex-wrap gap-6">
         <label className="flex items-center gap-2 text-sm">
@@ -167,10 +257,6 @@ export function ProductForm({ action, product, submitLabel, error }: Props) {
           Destaque na home
         </label>
       </div>
-
-      <button type="submit" className="btn btn-primary">
-        {submitLabel}
-      </button>
     </ProductFormShell>
   );
 }

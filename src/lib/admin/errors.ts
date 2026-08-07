@@ -8,11 +8,14 @@ export function translateAdminError(raw: string | null | undefined): string {
   // Códigos internos do app
   const codes: Record<string, string> = {
     campos: "Preencha todos os campos obrigatórios corretamente.",
+    foto: "Adicione ao menos uma foto do produto.",
     config:
       "Configuração do servidor incompleta (chave secret do Supabase ausente).",
     dono: "A dona não pode remover o próprio papel de owner.",
     falha: "Não foi possível concluir a operação.",
     id: "Produto não encontrado.",
+    "id-invalido":
+      "ID inválido. Use apenas letras, números e hífens (sem espaços).",
     "sem-permissao": "Você não tem permissão para essa ação.",
     "sem-acesso":
       "Conta sem acesso ao admin. Confira se o perfil foi criado no banco.",
@@ -20,7 +23,9 @@ export function translateAdminError(raw: string | null | undefined): string {
   };
   if (codes[msg]) return codes[msg];
 
-  // Auth
+  if (lower.includes("duplicate key") && lower.includes("sku")) {
+    return "Já existe um produto com este SKU.";
+  }
   if (lower.includes("user already registered")) {
     return "Este e-mail já está cadastrado.";
   }

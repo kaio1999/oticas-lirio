@@ -1,35 +1,40 @@
+import { cache } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { mapProfile, type AdminProfile, type ProfileRow } from "@/types/admin";
 import { redirect } from "next/navigation";
 
-export async function getSessionUser() {
+/** Dedupe getUser no mesmo request (layout + página). */
+export const getSessionUser = cache(async () => {
   const supabase = await createSupabaseServerClient();
   if (!supabase) return null;
   const {
     data: { user },
   } = await supabase.auth.getUser();
   return user;
-}
+});
 
-export async function getAdminProfile(): Promise<AdminProfile | null> {
-  const supabase = await createSupabaseServerClient();
-  if (!supabase) return null;
+/** Dedupe perfil admin no mesmo request. */
+export const getAdminProfile = cache(
+  async (): Promise<AdminProfile | null> => {
+    const supabase = await createSupabaseServerClient();
+    if (!supabase) return null;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+    const user = await getSessionUser();
+    if (!user) return null;
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .eq("active", true)
-    .maybeSingle();
+    const { data, error } = await supabase
+      .from("profiles")
+      .select(
+        "id, email, full_name, role, can_manage_products, can_manage_team, active, created_at",
+      )
+      .eq("id", user.id)
+      .eq("active", true)
+      .maybeSingle();
 
-  if (error || !data) return null;
-  return mapProfile(data as ProfileRow);
-}
+    if (error || !data) return null;
+    return mapProfile(data as ProfileRow);
+  },
+);
 
 export async function requireAdmin(): Promise<AdminProfile> {
   const profile = await getAdminProfile();

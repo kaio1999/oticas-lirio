@@ -20,9 +20,19 @@ create table if not exists public.products (
   in_stock boolean not null default true,
   description text not null default '',
   featured boolean not null default false,
+  -- Campos internos (só admin; a API pública não deve selecioná-los)
+  sku text,
+  lens_width_mm numeric(6, 1),
+  bridge_mm numeric(6, 1),
+  temple_mm numeric(6, 1),
+  frame_width_mm numeric(6, 1),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+create unique index if not exists products_sku_unique_idx
+  on public.products (sku)
+  where sku is not null and sku <> '';
 
 create index if not exists products_category_idx on public.products (category);
 create index if not exists products_featured_idx on public.products (featured) where featured = true;

@@ -1,6 +1,6 @@
 import { products as mockProducts } from "@/data/products";
 import { createSupabaseServerClient } from "@/lib/supabase/client";
-import { mapProductRow, type ProductRow } from "@/lib/supabase/mappers";
+import { mapProductRow, PRODUCT_PUBLIC_COLUMNS, type ProductRow } from "@/lib/supabase/mappers";
 import type { Product, ProductCategory, ProductShape } from "@/types/product";
 import { unstable_cache } from "next/cache";
 
@@ -70,7 +70,7 @@ async function fetchAllProductsUncached(): Promise<Product[] | null> {
 
   const { data, error } = await supabase
     .from("products")
-    .select("*")
+    .select(PRODUCT_PUBLIC_COLUMNS)
     .order("name", { ascending: true });
 
   if (error) {

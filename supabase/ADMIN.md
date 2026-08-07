@@ -8,6 +8,12 @@ No SQL Editor do Supabase, execute:
 
 `supabase/admin-schema.sql`
 
+Se o catálogo já existir e ainda não tiver SKU/medidas, rode também:
+
+`supabase/products-admin-fields.sql`
+
+(campos internos: SKU e medidas em mm — só no admin)
+
 ## 2. Criar a conta da dona
 
 1. **Authentication → Users → Add user**

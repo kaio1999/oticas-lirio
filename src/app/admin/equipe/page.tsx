@@ -3,6 +3,7 @@ import {
   updateStaffAction,
 } from "@/app/admin/actions/team";
 import { AdminFlash } from "@/components/admin/AdminFlash";
+import { PendingSubmitButton } from "@/components/admin/PendingSubmitButton";
 import { requirePermission } from "@/lib/admin/auth";
 import { translateAdminError } from "@/lib/admin/errors";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -89,9 +90,12 @@ export default async function EquipePage({
             </label>
           ) : null}
           <div className="sm:col-span-2">
-            <button type="submit" className="btn btn-primary">
+            <PendingSubmitButton
+              pendingLabel="Criando…"
+              className="btn btn-primary disabled:opacity-70"
+            >
               Criar acesso
-            </button>
+            </PendingSubmitButton>
           </div>
         </form>
       </section>
@@ -167,9 +171,12 @@ export default async function EquipePage({
                 A dona sempre tem acesso total.
               </p>
             ) : (
-              <button type="submit" className="btn btn-secondary mt-4 !min-h-9 !text-sm">
+              <PendingSubmitButton
+                pendingLabel="Salvando…"
+                className="btn btn-secondary mt-4 !min-h-9 !text-sm disabled:opacity-70"
+              >
                 Salvar permissões
-              </button>
+              </PendingSubmitButton>
             )}
           </form>
         ))}

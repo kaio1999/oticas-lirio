@@ -4,8 +4,13 @@ import { updateProductAction } from "@/app/admin/actions/products";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { requirePermission } from "@/lib/admin/auth";
 import { translateAdminError } from "@/lib/admin/errors";
+import { decodeProductIdParam } from "@/lib/admin/productId";
+import {
+  PRODUCT_ADMIN_COLUMNS,
+  mapProductRow,
+  type ProductRow,
+} from "@/lib/supabase/mappers";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { mapProductRow, type ProductRow } from "@/lib/supabase/mappers";
 
 type Params = Promise<{ id: string }>;
 type SearchParams = Promise<{ erro?: string }>;
@@ -18,14 +23,15 @@ export default async function EditarProdutoPage({
   searchParams: SearchParams;
 }) {
   await requirePermission("products");
-  const { id } = await params;
+  const { id: rawId } = await params;
+  const id = decodeProductIdParam(rawId);
   const sp = await searchParams;
   const supabase = await createSupabaseServerClient();
   if (!supabase) notFound();
 
   const { data } = await supabase
     .from("products")
-    .select("*")
+    .select(PRODUCT_ADMIN_COLUMNS)
     .eq("id", id)
     .maybeSingle();
 

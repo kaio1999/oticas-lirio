@@ -15,7 +15,18 @@ export type ProductRow = {
   in_stock: boolean;
   description: string;
   featured: boolean;
+  sku?: string | null;
+  lens_width_mm?: number | null;
+  bridge_mm?: number | null;
+  temple_mm?: number | null;
+  frame_width_mm?: number | null;
 };
+
+/** Colunas da vitrine — sem SKU/medidas. */
+export const PRODUCT_PUBLIC_COLUMNS =
+  "id, name, brand, category, price, images, model_3d_url, shape, material, colors, in_stock, description, featured";
+
+export const PRODUCT_ADMIN_COLUMNS = `${PRODUCT_PUBLIC_COLUMNS}, sku, lens_width_mm, bridge_mm, temple_mm, frame_width_mm`;
 
 export type StoreSettingsRow = {
   id: number;
@@ -37,6 +48,12 @@ export type StoreSettingsRow = {
   opened_at: string;
 };
 
+function optionalMm(value: number | null | undefined): number | null | undefined {
+  if (value == null) return value;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
 export function mapProductRow(row: ProductRow): Product {
   return {
     id: row.id,
@@ -52,6 +69,11 @@ export function mapProductRow(row: ProductRow): Product {
     inStock: row.in_stock,
     description: row.description,
     featured: row.featured || undefined,
+    sku: row.sku ?? null,
+    lensWidthMm: optionalMm(row.lens_width_mm),
+    bridgeMm: optionalMm(row.bridge_mm),
+    templeMm: optionalMm(row.temple_mm),
+    frameWidthMm: optionalMm(row.frame_width_mm),
   };
 }
 

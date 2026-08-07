@@ -22,4 +22,11 @@ export type Product = {
   inStock: boolean;
   description: string;
   featured?: boolean;
+  /** Uso interno (admin). Não exibir na vitrine. */
+  sku?: string | null;
+  /** Medidas em mm — uso interno / futuro try-on. */
+  lensWidthMm?: number | null;
+  bridgeMm?: number | null;
+  templeMm?: number | null;
+  frameWidthMm?: number | null;
 };

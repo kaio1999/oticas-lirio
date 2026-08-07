@@ -9,6 +9,7 @@ import {
   productDisplayName,
   shapeLabels,
 } from "@/lib/format";
+import { catalogProductPath } from "@/lib/admin/productId";
 import type { Product } from "@/types/product";
 
 type Props = {
@@ -28,7 +29,7 @@ export function ProductCard({ product, priority = false }: Props) {
 
   return (
     <Link
-      href={`/produtos/${product.id}`}
+      href={catalogProductPath(product.id)}
       className="group block h-full overflow-hidden rounded-2xl border border-line bg-white shadow-[0_10px_30px_#12121208] transition duration-300 hover:border-brand/35 hover:shadow-[0_22px_44px_#00b7c818]"
     >
       <div className="relative aspect-[8/5] overflow-hidden bg-sand">
