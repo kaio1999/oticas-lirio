@@ -22,7 +22,7 @@ export function ParallaxPortrait({
           alt={alt}
           fill
           priority={priority}
-          quality={80}
+          quality={92}
           className="parallax-portrait__img"
           sizes="(max-width: 768px) 92vw, (max-width: 1200px) 46vw, 560px"
         />

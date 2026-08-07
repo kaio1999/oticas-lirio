@@ -201,7 +201,8 @@ a {
 
 .parallax-portrait__img {
   object-fit: cover;
-  object-position: center 22%;
+  /* Corpo inteiro — centraliza a figura no frame 2:3 */
+  object-position: center center;
 }
 
 .logo-on-dark {
