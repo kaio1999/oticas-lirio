@@ -7,6 +7,7 @@ export type ProductRow = {
   brand: string;
   category: ProductCategory;
   price: number;
+  promo_price?: number | null;
   images: string[];
   model_3d_url: string | null;
   shape: ProductShape;
@@ -24,7 +25,7 @@ export type ProductRow = {
 
 /** Colunas da vitrine — sem SKU/medidas. */
 export const PRODUCT_PUBLIC_COLUMNS =
-  "id, name, brand, category, price, images, model_3d_url, shape, material, colors, in_stock, description, featured";
+  "id, name, brand, category, price, promo_price, images, model_3d_url, shape, material, colors, in_stock, description, featured";
 
 export const PRODUCT_ADMIN_COLUMNS = `${PRODUCT_PUBLIC_COLUMNS}, sku, lens_width_mm, bridge_mm, temple_mm, frame_width_mm`;
 
@@ -61,6 +62,10 @@ export function mapProductRow(row: ProductRow): Product {
     brand: row.brand,
     category: row.category,
     price: Number(row.price),
+    promoPrice:
+      row.promo_price == null || row.promo_price === undefined
+        ? null
+        : Number(row.promo_price),
     images: row.images ?? [],
     model3dUrl: row.model_3d_url ?? undefined,
     shape: row.shape,

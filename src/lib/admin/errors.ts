@@ -16,10 +16,18 @@ export function translateAdminError(raw: string | null | undefined): string {
     id: "Produto não encontrado.",
     "id-invalido":
       "ID inválido. Use apenas letras, números e hífens (sem espaços).",
+    "promo-maior":
+      "O preço promocional precisa ser menor que o preço cheio.",
+    "promo-vazia":
+      "Informe um preço promocional válido (maior ou igual a zero).",
     "sem-permissao": "Você não tem permissão para essa ação.",
     "sem-acesso":
       "Conta sem acesso ao admin. Confira se o perfil foi criado no banco.",
     credenciais: "E-mail ou senha incorretos.",
+    "horarios-invalidos": "Não foi possível ler os horários. Tente de novo.",
+    "horarios-vazios": "Adicione ao menos um horário.",
+    "horarios-dias": "Informe os dias em cada linha (ex.: Segunda a sexta).",
+    "horarios-hora": "Informe o horário ou marque como fechado.",
   };
   if (codes[msg]) return codes[msg];
 

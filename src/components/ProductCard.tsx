@@ -3,9 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { ProductPrice } from "@/components/ProductPrice";
+import { ProductStatusBadge } from "@/components/ProductStatusBadge";
 import {
   categoryLabels,
-  formatPrice,
   productDisplayName,
   shapeLabels,
 } from "@/lib/format";
@@ -42,13 +43,11 @@ export function ProductCard({ product, priority = false }: Props) {
           className="object-cover transition duration-500 group-hover:scale-[1.03]"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
         />
-        {!product.inStock ? (
-          <span className="absolute left-3 top-3 rounded-full bg-brand-deep px-3 py-1 text-xs font-medium text-white">
-            Indisponível
-          </span>
-        ) : null}
+        <div className="absolute left-3 top-3">
+          <ProductStatusBadge product={product} />
+        </div>
         {images.length > 1 ? (
-          <span className="absolute right-3 top-3 rounded-full bg-black/55 px-2.5 py-1 text-xs text-white">
+          <span className="absolute right-3 top-3 rounded-full bg-ink/40 px-2 py-1 text-[11px] font-medium text-white/90 backdrop-blur-sm">
             {images.length} fotos
           </span>
         ) : null}
@@ -82,9 +81,11 @@ export function ProductCard({ product, priority = false }: Props) {
           {categoryLabels[product.category]} · {shapeLabels[product.shape]}
         </p>
         <h3 className="font-display text-2xl text-brand-ink">{title}</h3>
-        <p className="pt-1 text-lg font-semibold text-brand-ink">
-          {formatPrice(product.price)}
-        </p>
+        <ProductPrice
+          price={product.price}
+          promoPrice={product.promoPrice}
+          size="card"
+        />
       </div>
     </Link>
   );

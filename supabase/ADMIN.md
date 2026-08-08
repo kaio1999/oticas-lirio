@@ -14,6 +14,12 @@ Se o catálogo já existir e ainda não tiver SKU/medidas, rode também:
 
 (campos internos: SKU e medidas em mm — só no admin)
 
+Para promoções de/para na vitrine, rode:
+
+`supabase/products-promo.sql`
+
+(coluna `promo_price` — controlada no admin, aparece no catálogo e na home)
+
 ## 2. Criar a conta da dona
 
 1. **Authentication → Users → Add user**

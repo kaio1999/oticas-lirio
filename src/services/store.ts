@@ -26,5 +26,5 @@ async function fetchStoreUncached(): Promise<StoreInfo> {
 export const getStoreInfo = unstable_cache(
   fetchStoreUncached,
   ["store-info"],
-  { revalidate: 120 },
+  { revalidate: 120, tags: ["store"] },
 );

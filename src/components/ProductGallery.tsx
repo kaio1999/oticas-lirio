@@ -2,15 +2,24 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { ProductStatusBadge } from "@/components/ProductStatusBadge";
+import type { Product } from "@/types/product";
 
 type Props = {
   images: string[];
   alt: string;
   priority?: boolean;
+  /** Dados para badge de status na capa. */
+  product?: Pick<Product, "price" | "promoPrice" | "inStock">;
 };
 
 /** Galeria: capa em destaque + miniaturas de todas as fotos. */
-export function ProductGallery({ images, alt, priority = false }: Props) {
+export function ProductGallery({
+  images,
+  alt,
+  priority = false,
+  product,
+}: Props) {
   const list =
     images.length > 0 ? images : ["/products/placeholder-aviador.svg"];
   const [active, setActive] = useState(0);
@@ -27,8 +36,13 @@ export function ProductGallery({ images, alt, priority = false }: Props) {
           className="object-cover"
           sizes="(max-width: 1024px) 100vw, 50vw"
         />
+        {product ? (
+          <div className="absolute left-4 top-4">
+            <ProductStatusBadge product={product} />
+          </div>
+        ) : null}
         {list.length > 1 ? (
-          <p className="absolute bottom-3 right-3 rounded-full bg-black/55 px-2.5 py-1 text-xs text-white">
+          <p className="absolute bottom-3 right-3 rounded-full bg-ink/40 px-2 py-1 text-[11px] font-medium text-white/90 backdrop-blur-sm">
             {active + 1} / {list.length}
           </p>
         ) : null}

@@ -61,6 +61,14 @@ export function AdminHeader({ profile }: Props) {
               Equipe
             </AdminNavLink>
           ) : null}
+          {profile.role === "owner" ? (
+            <AdminNavLink href="/admin/horarios" className={navClass}>
+              Horários
+            </AdminNavLink>
+          ) : null}
+          <AdminNavLink href="/admin/ajuda" className={navClass}>
+            Ajuda
+          </AdminNavLink>
           <AdminNavLink href="/" className={navClass} target="_blank" prefetch={false}>
             Ver site
           </AdminNavLink>

@@ -3,7 +3,13 @@ import { Suspense } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { CatalogFilters } from "@/features/catalog/CatalogFilters";
 import type { ProductCategory, ProductShape } from "@/types/product";
-import { getBrands, getMaterials, getPriceBounds, getProducts } from "@/services/products";
+import {
+  type CatalogSort,
+  getBrands,
+  getMaterials,
+  getPriceBounds,
+  getProducts,
+} from "@/services/products";
 
 export const revalidate = 60;
 
@@ -21,7 +27,21 @@ type SearchParams = Promise<{
   precoMin?: string;
   precoMax?: string;
   estoque?: string;
+  promo?: string;
+  ordem?: string;
 }>;
+
+function parseSort(raw?: string): CatalogSort {
+  const allowed: CatalogSort[] = [
+    "nome",
+    "nome-desc",
+    "preco-asc",
+    "preco-desc",
+    "promo",
+  ];
+  if (raw && (allowed as string[]).includes(raw)) return raw as CatalogSort;
+  return "nome";
+}
 
 export default async function ProdutosPage({
   searchParams,
@@ -47,6 +67,8 @@ export default async function ProdutosPage({
     minPrice: Number.isFinite(minPrice) ? minPrice : undefined,
     maxPrice: Number.isFinite(maxPrice) ? maxPrice : undefined,
     inStockOnly: params.estoque === "1",
+    promoOnly: params.promo === "1",
+    sort: parseSort(params.ordem),
   });
 
   return (
@@ -56,16 +78,18 @@ export default async function ProdutosPage({
           Catálogo
         </p>
         <h1 className="mt-2 font-display text-4xl text-brand-ink sm:text-5xl">
-            Encontre o seu próximo olhar
+          Encontre o seu próximo olhar
         </h1>
         <p className="mt-3 text-ink-muted">
-          Filtre por marca, categoria, formato, material e faixa de preço. Os
-          valores são referência — confirme disponibilidade na loja.
+          Filtre por marca, promoção, categoria e faixa de preço — e ordene como
+          preferir. Os valores são referência; confirme na loja.
         </p>
       </div>
 
       <div className="mt-8">
-        <Suspense fallback={<div className="h-40 animate-pulse rounded-2xl bg-white/50" />}>
+        <Suspense
+          fallback={<div className="h-40 animate-pulse rounded-2xl bg-white/50" />}
+        >
           <CatalogFilters
             materials={materials}
             brands={brands}
@@ -81,7 +105,9 @@ export default async function ProdutosPage({
 
       {products.length === 0 ? (
         <div className="mt-8 rounded-3xl border border-dashed border-line bg-white/50 px-6 py-16 text-center">
-          <p className="font-display text-3xl text-brand">Nenhum modelo neste filtro</p>
+          <p className="font-display text-3xl text-brand">
+            Nenhum modelo neste filtro
+          </p>
           <p className="mt-2 text-ink-muted">
             Tente limpar a busca ou escolher outra categoria.
           </p>

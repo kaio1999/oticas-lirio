@@ -1,8 +1,16 @@
 import { products as mockProducts } from "@/data/products";
+import { productEffectivePrice, productHasPromo } from "@/lib/format";
 import { createSupabaseServerClient } from "@/lib/supabase/client";
 import { mapProductRow, PRODUCT_PUBLIC_COLUMNS, type ProductRow } from "@/lib/supabase/mappers";
 import type { Product, ProductCategory, ProductShape } from "@/types/product";
 import { unstable_cache } from "next/cache";
+
+export type CatalogSort =
+  | "nome"
+  | "nome-desc"
+  | "preco-asc"
+  | "preco-desc"
+  | "promo";
 
 export type ProductFilters = {
   query?: string;
@@ -13,7 +21,36 @@ export type ProductFilters = {
   minPrice?: number;
   maxPrice?: number;
   inStockOnly?: boolean;
+  /** Só produtos com promoção ativa. */
+  promoOnly?: boolean;
+  sort?: CatalogSort;
 };
+
+function applySort(list: Product[], sort: CatalogSort = "nome"): Product[] {
+  const sorted = [...list];
+  switch (sort) {
+    case "nome-desc":
+      return sorted.sort((a, b) => b.name.localeCompare(a.name, "pt-BR"));
+    case "preco-asc":
+      return sorted.sort(
+        (a, b) => productEffectivePrice(a) - productEffectivePrice(b),
+      );
+    case "preco-desc":
+      return sorted.sort(
+        (a, b) => productEffectivePrice(b) - productEffectivePrice(a),
+      );
+    case "promo":
+      return sorted.sort((a, b) => {
+        const ap = productHasPromo(a) ? 0 : 1;
+        const bp = productHasPromo(b) ? 0 : 1;
+        if (ap !== bp) return ap - bp;
+        return a.name.localeCompare(b.name, "pt-BR");
+      });
+    case "nome":
+    default:
+      return sorted.sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+  }
+}
 
 function applyFilters(list: Product[], filters: ProductFilters): Product[] {
   let result = [...list];
@@ -50,18 +87,26 @@ function applyFilters(list: Product[], filters: ProductFilters): Product[] {
   }
 
   if (typeof filters.minPrice === "number" && Number.isFinite(filters.minPrice)) {
-    result = result.filter((p) => p.price >= filters.minPrice!);
+    result = result.filter(
+      (p) => productEffectivePrice(p) >= filters.minPrice!,
+    );
   }
 
   if (typeof filters.maxPrice === "number" && Number.isFinite(filters.maxPrice)) {
-    result = result.filter((p) => p.price <= filters.maxPrice!);
+    result = result.filter(
+      (p) => productEffectivePrice(p) <= filters.maxPrice!,
+    );
   }
 
   if (filters.inStockOnly) {
     result = result.filter((p) => p.inStock);
   }
 
-  return result;
+  if (filters.promoOnly) {
+    result = result.filter((p) => productHasPromo(p));
+  }
+
+  return applySort(result, filters.sort ?? "nome");
 }
 
 async function fetchAllProductsUncached(): Promise<Product[] | null> {
@@ -124,7 +169,7 @@ export async function getBrands(): Promise<string[]> {
 export async function getPriceBounds(): Promise<{ min: number; max: number }> {
   const list = await getCachedProducts();
   if (list.length === 0) return { min: 0, max: 1000 };
-  const prices = list.map((p) => p.price);
+  const prices = list.map((p) => productEffectivePrice(p));
   const min = Math.floor(Math.min(...prices));
   const max = Math.ceil(Math.max(...prices));
   return { min, max: max <= min ? min + 1 : max };

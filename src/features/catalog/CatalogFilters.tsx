@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { categoryLabels, formatPrice, shapeLabels } from "@/lib/format";
+import type { CatalogSort } from "@/services/products";
 
 const categories = ["todos", "grau", "sol", "infantil", "acessorio"] as const;
 const shapes = [
@@ -14,6 +15,14 @@ const shapes = [
   "retangular",
 ] as const;
 
+const sortOptions: { value: CatalogSort; label: string }[] = [
+  { value: "nome", label: "Nome A–Z" },
+  { value: "nome-desc", label: "Nome Z–A" },
+  { value: "preco-asc", label: "Menor preço" },
+  { value: "preco-desc", label: "Maior preço" },
+  { value: "promo", label: "Promoções primeiro" },
+];
+
 type Props = {
   materials: string[];
   brands: string[];
@@ -24,6 +33,18 @@ function parsePriceParam(raw: string | null, fallback: number) {
   if (raw == null || raw === "") return fallback;
   const n = Number(raw);
   return Number.isFinite(n) ? n : fallback;
+}
+
+function parseSort(raw: string | null): CatalogSort {
+  const allowed: CatalogSort[] = [
+    "nome",
+    "nome-desc",
+    "preco-asc",
+    "preco-desc",
+    "promo",
+  ];
+  if (raw && (allowed as string[]).includes(raw)) return raw as CatalogSort;
+  return "nome";
 }
 
 export function CatalogFilters({ materials, brands, priceBounds }: Props) {
@@ -83,17 +104,18 @@ export function CatalogFilters({ materials, brands, priceBounds }: Props) {
 
   const pctLeft = ((rangeMin - boundMin) / (boundMax - boundMin)) * 100;
   const pctRight = ((rangeMax - boundMin) / (boundMax - boundMin)) * 100;
+  const currentSort = parseSort(searchParams.get("ordem"));
 
   return (
     <form
-      className={`grid gap-3 rounded-2xl border border-line bg-white/60 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 ${pending ? "opacity-70" : ""}`}
+      className={`grid gap-3 rounded-2xl border border-line bg-white/60 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 ${pending ? "opacity-70" : ""}`}
       onSubmit={(e) => {
         e.preventDefault();
         const form = new FormData(e.currentTarget);
         update("q", String(form.get("q") ?? ""));
       }}
     >
-      <label className="block sm:col-span-2 lg:col-span-1 xl:col-span-1">
+      <label className="block sm:col-span-2 lg:col-span-1 xl:col-span-2">
         <span className="mb-1.5 block text-xs uppercase tracking-[0.12em] text-ink-muted">
           Busca
         </span>
@@ -175,7 +197,30 @@ export function CatalogFilters({ materials, brands, priceBounds }: Props) {
         </select>
       </label>
 
-      <div className="sm:col-span-2 lg:col-span-3 xl:col-span-5">
+      <label className="block sm:col-span-2 lg:col-span-1 xl:col-span-2">
+        <span className="mb-1.5 block text-xs uppercase tracking-[0.12em] text-ink-muted">
+          Ordenar
+        </span>
+        <select
+          className="w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none ring-brand/30 focus:ring-2"
+          value={currentSort}
+          onChange={(e) => {
+            const v = e.target.value as CatalogSort;
+            pushParams((params) => {
+              if (v === "nome") params.delete("ordem");
+              else params.set("ordem", v);
+            });
+          }}
+        >
+          {sortOptions.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <div className="sm:col-span-2 lg:col-span-3 xl:col-span-4">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <span className="text-xs uppercase tracking-[0.12em] text-ink-muted">
             Faixa de preço
@@ -256,11 +301,21 @@ export function CatalogFilters({ materials, brands, priceBounds }: Props) {
         </div>
       </div>
 
-      <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-3 xl:col-span-5">
+      <div className="flex flex-wrap items-end gap-x-4 gap-y-2 sm:col-span-2 lg:col-span-3 xl:col-span-6">
         <button type="submit" className="btn btn-primary">
           Buscar
         </button>
-        <label className="ml-auto flex items-center gap-2 text-sm text-ink-muted">
+        <label className="flex items-center gap-2 text-sm text-ink-muted">
+          <input
+            type="checkbox"
+            checked={searchParams.get("promo") === "1"}
+            onChange={(e) =>
+              update("promo", e.target.checked ? "1" : "todos")
+            }
+          />
+          Só promoções
+        </label>
+        <label className="flex items-center gap-2 text-sm text-ink-muted">
           <input
             type="checkbox"
             checked={searchParams.get("estoque") === "1"}

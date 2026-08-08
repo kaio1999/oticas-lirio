@@ -14,6 +14,8 @@ export type Product = {
   brand: string;
   category: ProductCategory;
   price: number;
+  /** Preço promocional (para). Se menor que price, vitrine mostra de/para. */
+  promoPrice?: number | null;
   images: string[];
   model3dUrl?: string;
   shape: ProductShape;

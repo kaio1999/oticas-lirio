@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ProductCard } from "@/components/ProductCard";
+import { FeaturedProducts } from "@/components/FeaturedProducts";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { getFeaturedProducts } from "@/services/products";
 import { getStoreInfo } from "@/services/store";
@@ -21,7 +21,7 @@ export default async function HomePage() {
           className="absolute inset-0 bg-[linear-gradient(165deg,#faf9f7_0%,#f3eee7_48%,#ebe4da_100%)] md:bg-[radial-gradient(ellipse_at_80%_20%,#00b7c81a_0%,transparent_42%),linear-gradient(165deg,#faf9f7_0%,#f3eee7_48%,#ebe4da_100%)]"
         />
 
-        <div className="container-page relative z-10 grid min-h-[min(88vh,820px)] items-center gap-10 py-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-14">
+        <div className="container-page relative z-10 grid items-center gap-10 py-10 md:min-h-[min(78vh,760px)] md:py-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-14">
           <div>
             <div className="flex items-center gap-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -44,16 +44,16 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <h1 className="mt-8 max-w-xl font-display text-[2.4rem] leading-[1.08] tracking-wide text-brand-ink sm:text-5xl lg:text-[3.4rem]">
+            <h1 className="mt-6 max-w-xl font-display text-[2.2rem] leading-[1.08] tracking-wide text-brand-ink sm:mt-8 sm:text-5xl lg:text-[3.4rem]">
               {store.slogan}
             </h1>
 
-            <p className="mt-5 max-w-md text-lg leading-relaxed text-ink-muted">
+            <p className="mt-4 max-w-md text-base leading-relaxed text-ink-muted sm:mt-5 sm:text-lg">
               Curadoria de armações e atendimento próximo, com o carinho de quem
               entende que cada olhar é único.
             </p>
 
-            <div className="mt-9 flex flex-wrap gap-3">
+            <div className="mt-7 flex flex-wrap gap-3 sm:mt-9">
               <Link href="/produtos" className="btn btn-primary">
                 Ver catálogo
               </Link>
@@ -63,7 +63,8 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="relative">
+          {/* Painel da marca só no desktop — no mobile libera espaço pro carrossel */}
+          <div className="relative hidden lg:block">
             <div className="panel-brand relative overflow-hidden rounded-[2rem] p-8 shadow-[0_28px_60px_#0d5c6620] sm:p-12">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -80,31 +81,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="container-page py-16 md:py-20">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-brand-ink">
-              Destaques
-            </p>
-            <h2 className="mt-2 font-display text-4xl text-brand-ink sm:text-5xl">
-              Modelos em evidência
-            </h2>
-          </div>
-          <Link href="/produtos" className="btn btn-secondary">
-            Ver todos
-          </Link>
-        </div>
-
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {featured.slice(0, 4).map((product, index) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              priority={index < 2}
-            />
-          ))}
-        </div>
-      </section>
+      <FeaturedProducts products={featured} />
 
       <section className="border-y border-line bg-white/50">
         <div className="container-page grid gap-10 py-14 md:py-20 lg:grid-cols-2 lg:items-center">

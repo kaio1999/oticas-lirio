@@ -15,7 +15,7 @@ import {
   getAdminProductBrands,
   getAdminProductsPage,
 } from "@/lib/admin/products";
-import { categoryLabels, formatPrice, shapeLabels } from "@/lib/format";
+import { categoryLabels, formatPrice, productHasPromo, shapeLabels } from "@/lib/format";
 import type { ProductCategory } from "@/types/product";
 
 type SearchParams = Promise<{
@@ -146,7 +146,23 @@ export default async function AdminProductsPage({
                   </p>
                 </td>
                 <td className="px-4 py-3">{categoryLabels[p.category]}</td>
-                <td className="px-4 py-3">{formatPrice(p.price)}</td>
+                <td className="px-4 py-3">
+                  {productHasPromo(p) ? (
+                    <div className="space-y-0.5">
+                      <p className="text-xs text-ink-muted line-through">
+                        {formatPrice(p.price)}
+                      </p>
+                      <p className="font-medium text-brand-ink">
+                        {formatPrice(Number(p.promoPrice))}
+                        <span className="ml-1.5 rounded-full bg-brand/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-brand-ink">
+                          Promo
+                        </span>
+                      </p>
+                    </div>
+                  ) : (
+                    formatPrice(p.price)
+                  )}
+                </td>
                 <td className="px-4 py-3">
                   <form action={toggleStockAction}>
                     <input type="hidden" name="id" value={p.id} />

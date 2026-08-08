@@ -56,3 +56,12 @@ export async function requirePermission(
   }
   return profile;
 }
+
+/** Somente a dona (owner). */
+export async function requireOwner(): Promise<AdminProfile> {
+  const profile = await requireAdmin();
+  if (profile.role !== "owner") {
+    redirect("/admin?erro=sem-permissao");
+  }
+  return profile;
+}

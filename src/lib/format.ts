@@ -7,6 +7,24 @@ export function formatPrice(value: number): string {
   }).format(value);
 }
 
+type PriceLike = { price: number; promoPrice?: number | null };
+
+/** Tem promoção ativa (preço para menor que o de). */
+export function productHasPromo(p: PriceLike): boolean {
+  const promo = p.promoPrice;
+  return (
+    typeof promo === "number" &&
+    Number.isFinite(promo) &&
+    promo >= 0 &&
+    promo < p.price
+  );
+}
+
+/** Preço que o cliente paga (promo ou cheio). */
+export function productEffectivePrice(p: PriceLike): number {
+  return productHasPromo(p) ? Number(p.promoPrice) : p.price;
+}
+
 /** Formata valor para o input mascarado (ex.: 1.234,56). */
 export function formatBRLMask(value: number): string {
   return new Intl.NumberFormat("pt-BR", {

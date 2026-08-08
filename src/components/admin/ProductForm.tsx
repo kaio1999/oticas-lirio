@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { AdminFlash } from "@/components/admin/AdminFlash";
 import { CurrencyInput } from "@/components/admin/CurrencyInput";
 import {
   ProductFormShell,
   ProductImagesField,
 } from "@/components/admin/ProductImagesField";
+import { productHasPromo } from "@/lib/format";
 import type { Product, ProductCategory, ProductShape } from "@/types/product";
 
 const categories: ProductCategory[] = ["grau", "sol", "infantil", "acessorio"];
@@ -27,6 +29,9 @@ type Props = {
 
 export function ProductForm({ action, product, submitLabel, error }: Props) {
   const isCreate = !product;
+  const [onPromo, setOnPromo] = useState(
+    product ? productHasPromo(product) : false,
+  );
 
   return (
     <ProductFormShell
@@ -35,11 +40,7 @@ export function ProductForm({ action, product, submitLabel, error }: Props) {
       requireImages={isCreate}
       className="space-y-5 rounded-2xl border border-line bg-white p-6"
     >
-      <AdminFlash
-        message={error}
-        variant="error"
-        className=""
-      />
+      <AdminFlash message={error} variant="error" className="" />
 
       {product ? <input type="hidden" name="id" value={product.id} /> : null}
 
@@ -95,6 +96,39 @@ export function ProductForm({ action, product, submitLabel, error }: Props) {
             Digite os centavos: 10050 vira R$ 100,50
           </span>
         </label>
+
+        <div className="space-y-3 rounded-xl border border-dashed border-brand/30 bg-brand/5 p-3 sm:col-span-2">
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              name="onPromo"
+              checked={onPromo}
+              onChange={(e) => setOnPromo(e.target.checked)}
+              className="size-4 rounded border-line"
+            />
+            Em promoção (de / para)
+          </label>
+          {onPromo ? (
+            <label className="block text-sm font-medium">
+              Preço promocional (para) *
+              <div className="mt-1.5">
+                <CurrencyInput
+                  name="promoPrice"
+                  required
+                  defaultValue={
+                    product && productHasPromo(product)
+                      ? Number(product.promoPrice)
+                      : 0
+                  }
+                />
+              </div>
+              <span className="mt-1 block text-xs text-ink-muted">
+                Deve ser menor que o preço cheio. Aparece no catálogo e nos
+                destaques da home.
+              </span>
+            </label>
+          ) : null}
+        </div>
 
         <label className="block text-sm font-medium">
           Categoria

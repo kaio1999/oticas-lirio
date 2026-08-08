@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductGallery } from "@/components/ProductGallery";
+import { ProductPrice } from "@/components/ProductPrice";
 import { decodeProductIdParam } from "@/lib/admin/productId";
 import {
   categoryLabels,
-  formatPrice,
   productDisplayName,
   shapeLabels,
 } from "@/lib/format";
@@ -60,6 +60,7 @@ export default async function ProdutoDetalhePage({
           images={product.images}
           alt={title}
           priority
+          product={product}
         />
 
         <div>
@@ -69,9 +70,11 @@ export default async function ProdutoDetalhePage({
           <h1 className="mt-2 font-display text-4xl text-brand sm:text-5xl">
             {title}
           </h1>
-          <p className="mt-5 text-3xl font-medium text-ink">
-            {formatPrice(product.price)}
-          </p>
+          <ProductPrice
+            price={product.price}
+            promoPrice={product.promoPrice}
+            size="detail"
+          />
           <p className="mt-5 max-w-lg text-ink-muted">{product.description}</p>
 
           <dl className="mt-8 grid gap-4 sm:grid-cols-2">

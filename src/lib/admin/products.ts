@@ -19,6 +19,7 @@ export type AdminProductListItem = {
   brand: string;
   category: ProductCategory;
   price: number;
+  promoPrice?: number | null;
   shape: Product["shape"];
   material: string;
   inStock: boolean;
@@ -45,6 +46,7 @@ function toListItem(p: Product): AdminProductListItem {
     brand: p.brand,
     category: p.category,
     price: p.price,
+    promoPrice: p.promoPrice ?? null,
     shape: p.shape,
     material: p.material,
     inStock: p.inStock,
@@ -110,7 +112,7 @@ export async function getAdminProductsPage(
   let query = supabase
     .from("products")
     .select(
-      "id, name, brand, category, price, shape, material, in_stock, featured, sku",
+      "id, name, brand, category, price, promo_price, shape, material, in_stock, featured, sku",
       { count: "exact" },
     )
     .order("name", { ascending: true });
@@ -158,6 +160,10 @@ export async function getAdminProductsPage(
     brand: row.brand as string,
     category: row.category as ProductCategory,
     price: Number(row.price),
+    promoPrice:
+      row.promo_price == null || row.promo_price === undefined
+        ? null
+        : Number(row.promo_price),
     shape: row.shape as Product["shape"],
     material: row.material as string,
     inStock: Boolean(row.in_stock),

@@ -62,6 +62,21 @@ function parseProductFields(formData: FormData) {
   const shape = String(formData.get("shape") || "outro") as ProductShape;
   const material = String(formData.get("material") || "").trim();
   const price = parseBRLCurrency(String(formData.get("price") || "0"));
+  const onPromo = formData.get("onPromo") === "on";
+  const promoRaw = parseBRLCurrency(String(formData.get("promoPrice") || ""));
+  let promo_price: number | null = null;
+  let promoError: string | null = null;
+
+  if (onPromo) {
+    if (!Number.isFinite(promoRaw) || promoRaw < 0) {
+      promoError = "promo-vazia";
+    } else if (!(promoRaw < price)) {
+      promoError = "promo-maior";
+    } else {
+      promo_price = promoRaw;
+    }
+  }
+
   const description = String(formData.get("description") || "").trim();
   const colorsRaw = String(formData.get("colors") || "");
   const colors = colorsRaw
@@ -79,6 +94,8 @@ function parseProductFields(formData: FormData) {
     shape,
     material,
     price,
+    promo_price,
+    promoError,
     description,
     colors,
     in_stock: inStock,
@@ -187,9 +204,12 @@ export async function createProductAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   if (!supabase) failProduto("/admin/produtos/novo", "config");
 
-  const fields = parseProductFields(formData);
+  const { promoError, ...fields } = parseProductFields(formData);
   if (!fields.name || !fields.brand || !fields.material || Number.isNaN(fields.price)) {
     failProduto("/admin/produtos/novo", "campos");
+  }
+  if (promoError) {
+    failProduto("/admin/produtos/novo", promoError);
   }
 
   const customId = String(formData.get("id") || "").trim();
@@ -238,9 +258,12 @@ export async function updateProductAction(formData: FormData) {
   const id = String(formData.get("id") || "").trim();
   if (!id) failProduto("/admin/produtos", "id");
 
-  const fields = parseProductFields(formData);
+  const { promoError, ...fields } = parseProductFields(formData);
   if (!fields.name || !fields.brand || !fields.material || Number.isNaN(fields.price)) {
     failProduto(adminProductPath(id), "campos");
+  }
+  if (promoError) {
+    failProduto(adminProductPath(id), promoError);
   }
 
   const { data: current } = await supabase

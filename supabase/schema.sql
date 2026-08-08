@@ -10,6 +10,7 @@ create table if not exists public.products (
   brand text not null default 'Óticas Lírio',
   category text not null check (category in ('grau', 'sol', 'infantil', 'acessorio')),
   price numeric(10, 2) not null check (price >= 0),
+  promo_price numeric(10, 2) check (promo_price is null or promo_price >= 0),
   images text[] not null default '{}',
   model_3d_url text,
   shape text not null check (
