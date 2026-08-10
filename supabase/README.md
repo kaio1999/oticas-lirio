@@ -1,45 +1,24 @@
 # Supabase — Óticas Lírio
 
-## 1. Criar projeto
-1. Acesse [supabase.com](https://supabase.com) e crie um projeto
-2. Em **Project Settings → API**, copie URL e keys
+## Dois ambientes
 
-## 2. Schema
-No **SQL Editor**, rode o arquivo `schema.sql` deste diretório.
+| Ambiente | Projeto Supabase | Onde configura |
+|----------|------------------|----------------|
+| **DEV** | `jdfcsnaqzllhhrjzeybq` | `.env.local` + Vercel Development |
+| **PRODUÇÃO** | `tmjnksgwrysxjqamwcsi` | Vercel Production / Preview |
 
-## 3. Variáveis de ambiente
-Na raiz do repo:
+Testar criação de produto no `npm run dev` **não** altera o site no ar.
 
+### Comandos (sempre no banco do `.env.local`)
 ```bash
-cp supabase/.env.example .env.local
+npm run db:seed                 # sobe mocks (DEV)
+CONFIRM=YES npm run db:clear-products   # apaga produtos
 ```
 
-Preencha `NEXT_PUBLIC_SUPABASE_URL`, a chave pública
-(`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ou `NEXT_PUBLIC_SUPABASE_ANON_KEY`) e
-`SUPABASE_SERVICE_ROLE_KEY` / secret (esta última só para o seed).
+### SQL em projeto novo
+Ordem no SQL Editor: `schema.sql` → `grants.sql` → `admin-schema.sql`  
+(+ `products-admin-fields.sql` / `products-promo.sql` se o schema base ainda não tiver).
 
-## 4. Seed (dados iniciais)
-```bash
-npm run db:seed
-```
+Bucket Storage: `products` (leitura pública).
 
-Isso envia os produtos e dados da loja que estão em `src/data/`.
-
-## 5. Rodar o site
-```bash
-npm run dev
-```
-
-Com as env vars configuradas, `src/services/*` lê do Supabase.
-Sem elas, o site continua usando os mocks locais (fallback).
-
-## Produção (Vercel)
-- Conecte o repositório
-- Adicione `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- **Não** coloque `SUPABASE_SERVICE_ROLE_KEY` como variável pública
-- Domínio custom opcional
-
-## Próximos passos
-- Painel `/admin` com Auth (e-mail/senha) — ver `ADMIN.md`
-- Upload de fotos no bucket `products`
-- Pedidos / pagamento (futuro)
+Admin: ver `ADMIN.md` (criar usuário + profile no projeto correspondente).

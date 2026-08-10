@@ -9,7 +9,8 @@
     "lint": "eslint",
     "generate:logos": "node scripts/generate-logos.mjs",
     "db:seed": "tsx scripts/seed-supabase.ts",
-    "db:schema": "echo 'Abra supabase/schema.sql no SQL Editor do Supabase'"
+    "db:schema": "echo 'Abra supabase/schema.sql no SQL Editor do Supabase'",
+    "db:clear-products": "tsx scripts/clear-products.ts"
   },
   "dependencies": {
     "@sentry/nextjs": "^10.70.0",
