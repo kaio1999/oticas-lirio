@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { ContactLink } from "@/components/TrackedCta";
 
 const links = [
   { href: "/produtos", label: "Catálogo" },
   { href: "/sobre", label: "A loja" },
   { href: "/fundadora", label: "Fundadora" },
-  { href: "/contato", label: "Contato" },
-];
+] as const;
 
 /** Só o menu mobile precisa de estado — isola o JS do header. */
 export function MobileNav() {
@@ -57,6 +57,19 @@ export function MobileNav() {
                 </Link>
               </li>
             ))}
+            <li>
+              <ContactLink
+                place="header_mobile"
+                className={`block rounded-xl px-3 py-3 ${
+                  pathname === "/contato" || pathname.startsWith("/contato/")
+                    ? "bg-brand/15 font-medium text-brand-ink"
+                    : "text-ink"
+                }`}
+                onClick={() => setOpen(false)}
+              >
+                Contato
+              </ContactLink>
+            </li>
           </ul>
         </nav>
       ) : null}

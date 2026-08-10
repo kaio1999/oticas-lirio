@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PhoneLink, WhatsAppLink } from "@/components/TrackedCta";
 import { getStoreInfo } from "@/services/store";
 import { whatsappUrl } from "@/lib/whatsapp";
 
@@ -71,12 +72,13 @@ export default async function ContatoPage() {
             <ul className="mt-4 space-y-3 text-ink-muted">
               <li>
                 Telefone:{" "}
-                <a
+                <PhoneLink
                   href={`tel:+${store.phoneE164}`}
+                  place="contato"
                   className="text-brand hover:underline"
                 >
                   {store.phone}
-                </a>
+                </PhoneLink>
               </li>
               <li>
                 Instagram:{" "}
@@ -99,14 +101,13 @@ export default async function ContatoPage() {
                 </a>
               </li>
             </ul>
-            <a
+            <WhatsAppLink
               href={whatsappUrl()}
-              target="_blank"
-              rel="noreferrer"
+              place="contato"
               className="btn btn-whatsapp mt-5"
             >
               Conversar no WhatsApp
-            </a>
+            </WhatsAppLink>
           </article>
         </div>
 

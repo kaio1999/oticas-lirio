@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Outfit } from "next/font/google";
 import { headers } from "next/headers";
 import { Footer } from "@/components/Footer";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { Header } from "@/components/Header";
 import "./globals.css";
 
@@ -61,6 +62,7 @@ export default async function RootLayout({
       className={`${display.variable} ${sans.variable} h-full`}
     >
       <body className="flex min-h-full flex-col antialiased">
+        {!isAdmin ? <GoogleAnalytics /> : null}
         {isAdmin ? (
           children
         ) : (

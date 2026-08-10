@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FeaturedProducts } from "@/components/FeaturedProducts";
+import { ContactLink, WhatsAppLink } from "@/components/TrackedCta";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { getFeaturedProducts } from "@/services/products";
 import { getStoreInfo } from "@/services/store";
@@ -57,9 +58,9 @@ export default async function HomePage() {
               <Link href="/produtos" className="btn btn-primary">
                 Ver catálogo
               </Link>
-              <Link href="/contato" className="btn btn-accent">
+              <ContactLink place="home_hero" className="btn btn-accent">
                 Falar com a loja
-              </Link>
+              </ContactLink>
             </div>
           </div>
 
@@ -96,9 +97,9 @@ export default async function HomePage() {
               Orientação personalizada na escolha da armação e das lentes, com o
               cuidado de quem acompanha cada detalhe.
             </p>
-            <Link href="/contato" className="btn btn-primary mt-8">
+            <ContactLink place="home_atendimento" className="btn btn-primary mt-8">
               Como chegar
-            </Link>
+            </ContactLink>
           </div>
 
           <div className="glass-panel rounded-[1.75rem] p-8 md:p-10">
@@ -171,17 +172,16 @@ export default async function HomePage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <a
+              <WhatsAppLink
                 href={whatsappUrl()}
-                target="_blank"
-                rel="noreferrer"
+                place="home_cta"
                 className="btn btn-accent"
               >
                 Falar agora
-              </a>
-              <Link href="/contato" className="btn btn-ghost-light">
+              </WhatsAppLink>
+              <ContactLink place="home_cta" className="btn btn-ghost-light">
                 Como chegar
-              </Link>
+              </ContactLink>
             </div>
           </div>
         </div>

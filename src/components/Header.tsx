@@ -1,14 +1,14 @@
-import Link from "next/link";
+import { ContactLink } from "@/components/TrackedCta";
 import { MobileNav } from "@/components/MobileNav";
+import Link from "next/link";
 
 const links = [
   { href: "/produtos", label: "Catálogo" },
   { href: "/sobre", label: "A loja" },
   { href: "/fundadora", label: "Fundadora" },
-  { href: "/contato", label: "Contato" },
-];
+] as const;
 
-/** Header server-side — JS só no menu mobile. */
+/** Header server-side — JS só no menu mobile e no link Contato (analytics). */
 export function Header() {
   return (
     <header className="relative sticky top-0 z-50 border-b border-line bg-[#faf9f7] md:bg-[#faf9f7e6] md:backdrop-blur-md">
@@ -38,6 +38,12 @@ export function Header() {
               {link.label}
             </Link>
           ))}
+          <ContactLink
+            place="header"
+            className="rounded-full px-3.5 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-sand hover:text-ink"
+          >
+            Contato
+          </ContactLink>
         </nav>
 
         <MobileNav />

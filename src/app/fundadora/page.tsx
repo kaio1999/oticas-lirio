@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ParallaxPortrait } from "@/components/ParallaxPortrait";
+import { WhatsAppLink } from "@/components/TrackedCta";
 import { storeInfo } from "@/data/store";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { getStoreInfo } from "@/services/store";
@@ -46,16 +47,15 @@ export default async function FundadoraPage() {
           </blockquote>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <a
+            <WhatsAppLink
               href={whatsappUrl(
                 `Olá, ${store.founder.name}! Vim pelo site e gostaria de conversar.`,
               )}
-              target="_blank"
-              rel="noreferrer"
+              place="fundadora"
               className="btn btn-whatsapp"
             >
               Falar no WhatsApp
-            </a>
+            </WhatsAppLink>
             <Link href="/sobre" className="btn btn-secondary">
               Sobre a loja
             </Link>

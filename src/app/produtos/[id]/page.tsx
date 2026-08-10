@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductGallery } from "@/components/ProductGallery";
 import { ProductPrice } from "@/components/ProductPrice";
+import { ContactLink, WhatsAppLink } from "@/components/TrackedCta";
 import { decodeProductIdParam } from "@/lib/admin/productId";
 import {
   categoryLabels,
@@ -103,19 +104,18 @@ export default async function ProdutoDetalhePage({
           </dl>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <a
+            <WhatsAppLink
               href={whatsappUrl(
                 `Olá! Tenho interesse no modelo ${title} (${product.id}).`,
               )}
-              target="_blank"
-              rel="noreferrer"
+              place="produto_detalhe"
               className="btn btn-primary"
             >
               Falar com a loja
-            </a>
-            <Link href="/contato" className="btn btn-secondary">
+            </WhatsAppLink>
+            <ContactLink place="produto_detalhe" className="btn btn-secondary">
               Como chegar
-            </Link>
+            </ContactLink>
           </div>
         </div>
       </div>

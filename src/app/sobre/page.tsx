@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ContactLink } from "@/components/TrackedCta";
 import { getStoreInfo } from "@/services/store";
 
 export const revalidate = 120;
@@ -71,9 +72,9 @@ export default async function SobrePage() {
           <Link href="/fundadora" className="btn btn-accent">
             Conhecer a fundadora
           </Link>
-          <Link href="/contato" className="btn btn-ghost-light">
+          <ContactLink place="sobre" className="btn btn-ghost-light">
             Visitar a loja
-          </Link>
+          </ContactLink>
         </div>
       </section>
     </div>

@@ -1,4 +1,9 @@
 import Link from "next/link";
+import {
+  ContactLink,
+  PhoneLink,
+  WhatsAppLink,
+} from "@/components/TrackedCta";
 import { getStoreInfo } from "@/services/store";
 import { whatsappUrl } from "@/lib/whatsapp";
 
@@ -49,9 +54,9 @@ export async function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/contato" className="hover:text-white">
+              <ContactLink place="footer_nav" className="hover:text-white">
                 Contato
-              </Link>
+              </ContactLink>
             </li>
           </ul>
         </div>
@@ -63,9 +68,13 @@ export async function Footer() {
           <ul className="mt-4 space-y-2 text-white/75">
             <li>{store.address.full}</li>
             <li>
-              <a href={`tel:+${store.phoneE164}`} className="hover:text-white">
+              <PhoneLink
+                href={`tel:+${store.phoneE164}`}
+                place="footer"
+                className="hover:text-white"
+              >
                 {store.phone}
-              </a>
+              </PhoneLink>
             </li>
             <li>
               <a
@@ -78,14 +87,13 @@ export async function Footer() {
               </a>
             </li>
             <li>
-              <a
+              <WhatsAppLink
                 href={whatsappUrl()}
-                target="_blank"
-                rel="noreferrer"
+                place="footer"
                 className="hover:text-white"
               >
                 WhatsApp
-              </a>
+              </WhatsAppLink>
             </li>
           </ul>
         </div>
