@@ -29,12 +29,16 @@ export const metadata: Metadata = {
   },
   description:
     "Óticas Lírio em Ribeirão Pires/SP. Catálogo de óculos e atendimento personalizado.",
-  metadataBase: new URL("https://oticaslirio.local"),
+  metadataBase: new URL("https://www.oticaslirio.com.br"),
+  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+    : undefined,
   openGraph: {
     title: "Óticas Lírio",
     description: "Um amor por cada óculos! Catálogo e atendimento próximo.",
     locale: "pt_BR",
     type: "website",
+    url: "https://www.oticaslirio.com.br",
     images: ["/logos/social-1080x1080.png"],
   },
   icons: {
