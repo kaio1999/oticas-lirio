@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Outfit } from "next/font/google";
-import { headers } from "next/headers";
-import { Footer } from "@/components/Footer";
-import { GoogleAnalytics } from "@/components/GoogleAnalytics";
-import { Header } from "@/components/Header";
 import "./globals.css";
 
 const display = Cormorant_Garamond({
@@ -51,32 +47,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = (await headers()).get("x-pathname") || "";
-  const isAdmin = pathname.startsWith("/admin");
-
   return (
     <html
       lang="pt-BR"
       data-scroll-behavior="smooth"
       className={`${display.variable} ${sans.variable} h-full`}
     >
-      <body className="flex min-h-full flex-col antialiased">
-        {!isAdmin ? <GoogleAnalytics /> : null}
-        {isAdmin ? (
-          children
-        ) : (
-          <>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </>
-        )}
-      </body>
+      <body className="flex min-h-full flex-col antialiased">{children}</body>
     </html>
   );
 }
