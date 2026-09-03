@@ -121,49 +121,52 @@ export function ProductGallery({
 
       {lightboxOpen ? (
         <div
-          className="fixed inset-0 z-[80] flex flex-col bg-black/92"
+          className="fixed inset-0 z-[80] flex flex-col bg-[#0a1214]/95"
           role="dialog"
           aria-modal="true"
           aria-label={`Fotos — ${alt}`}
           onClick={() => setLightboxOpen(false)}
         >
           <div
-            className="flex items-center justify-between gap-3 px-4 py-3 text-white sm:px-6"
+            className="flex items-center justify-between gap-3 px-4 py-3 sm:px-6"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="truncate text-sm text-white/80">{alt}</p>
+            <p className="truncate text-sm text-white/75">{alt}</p>
             <div className="flex shrink-0 items-center gap-3">
               {hasMany ? (
-                <p className="tabular-nums text-sm text-white/70">
+                <p className="rounded-full bg-white/10 px-2.5 py-1 tabular-nums text-xs font-medium text-white">
                   {active + 1} / {list.length}
                 </p>
               ) : null}
               <button
                 type="button"
                 onClick={() => setLightboxOpen(false)}
-                className="rounded-full bg-white/10 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-white/20"
+                className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-brand-ink shadow-lg transition hover:bg-[#f3fbfc]"
               >
+                <span aria-hidden className="text-base leading-none">
+                  ×
+                </span>
                 Fechar
               </button>
             </div>
           </div>
 
           <div
-            className="relative flex min-h-0 flex-1 items-center justify-center px-3 pb-6 sm:px-14"
+            className="relative flex min-h-0 flex-1 items-center justify-center px-14 pb-8 sm:px-20"
             onClick={(e) => e.stopPropagation()}
           >
             {hasMany ? (
               <button
                 type="button"
                 onClick={goPrev}
-                className="absolute left-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-2xl leading-none text-white transition hover:bg-white/25 sm:left-4"
+                className="absolute left-3 top-1/2 z-10 flex size-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-brand-ink shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition hover:scale-105 hover:bg-[#e8f8fa] active:scale-95 sm:left-5 sm:size-14"
                 aria-label="Foto anterior"
               >
-                ‹
+                <ChevronLeftIcon />
               </button>
             ) : null}
 
-            <div className="relative w-full max-w-5xl overflow-hidden rounded-2xl bg-black/40 shadow-2xl aspect-[8/5]">
+            <div className="relative w-full max-w-5xl overflow-hidden rounded-2xl bg-black/30 shadow-2xl aspect-[8/5] ring-1 ring-white/10">
               <ProductImage
                 src={current}
                 alt={alt}
@@ -178,15 +181,57 @@ export function ProductGallery({
               <button
                 type="button"
                 onClick={goNext}
-                className="absolute right-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-2xl leading-none text-white transition hover:bg-white/25 sm:right-4"
+                className="absolute right-3 top-1/2 z-10 flex size-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-brand-ink shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition hover:scale-105 hover:bg-[#e8f8fa] active:scale-95 sm:right-5 sm:size-14"
                 aria-label="Próxima foto"
               >
-                ›
+                <ChevronRightIcon />
               </button>
             ) : null}
           </div>
         </div>
       ) : null}
     </div>
+  );
+}
+
+function ChevronLeftIcon() {
+  return (
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+      className="sm:h-6 sm:w-6"
+    >
+      <path
+        d="M14.5 5.5 8 12l6.5 6.5"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ChevronRightIcon() {
+  return (
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+      className="sm:h-6 sm:w-6"
+    >
+      <path
+        d="M9.5 5.5 16 12l-6.5 6.5"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
