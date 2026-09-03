@@ -1,12 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import {
-  cropImageStyle,
-  defaultCrop,
-  type ImageCrop,
-} from "@/lib/productImageCrop";
+import { cropImageStyle, type ImageCrop } from "@/lib/productImageCrop";
 
 type Props = {
   src: string;
@@ -20,8 +15,9 @@ type Props = {
 };
 
 /**
- * Exibe a foto com o enquadramento salvo no admin.
- * Sem recorte salvo, usa o centro 8:5 da imagem após carregar.
+ * Sem crop salvo: next/image + object-cover (comportamento antigo da vitrine).
+ * Com crop: img nativo com enquadramento absoluto.
+ * Não aplica defaultCrop no onLoad — isso trocava o renderer e deixava o catálogo inconsistente.
  */
 export function ProductImage({
   src,
@@ -32,24 +28,15 @@ export function ProductImage({
   sizes,
   containerClassName = "relative overflow-hidden",
 }: Props) {
-  const [resolvedCrop, setResolvedCrop] = useState<ImageCrop | null>(
-    crop ?? null,
-  );
-
-  useEffect(() => {
-    setResolvedCrop(crop ?? null);
-  }, [crop, src]);
-
-  if (resolvedCrop) {
+  if (crop) {
     return (
       <div className={containerClassName}>
-        {/* img nativo: recorte usa width/left — incompatível com next/image fill */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src}
           alt={alt}
           className={className}
-          style={cropImageStyle(resolvedCrop)}
+          style={cropImageStyle(crop)}
           loading={priority ? "eager" : "lazy"}
           decoding="async"
           fetchPriority={priority ? "high" : undefined}
@@ -66,15 +53,7 @@ export function ProductImage({
         fill
         priority={priority}
         sizes={sizes}
-        className={className}
-        onLoad={(e) => {
-          const img = e.currentTarget;
-          if (img.naturalWidth > 0) {
-            setResolvedCrop(
-              defaultCrop(img.naturalWidth, img.naturalHeight),
-            );
-          }
-        }}
+        className={`object-cover ${className}`.trim()}
       />
     </div>
   );

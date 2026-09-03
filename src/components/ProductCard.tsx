@@ -41,7 +41,7 @@ export function ProductCard({ product, priority = false }: Props) {
           crop={cropForIndex(product.imageCrops, index)}
           priority={priority}
           containerClassName="absolute inset-0"
-          className="transition duration-500 group-hover:scale-[1.03]"
+          className="object-cover transition duration-500 group-hover:scale-[1.03]"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
         />
         <div className="absolute left-3 top-3">
