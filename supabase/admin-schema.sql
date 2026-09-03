@@ -112,6 +112,7 @@ create policy "profiles_insert_team"
 
 -- Trocar políticas de escrita de produtos/loja
 drop policy if exists "products_auth_write" on public.products;
+drop policy if exists "products_admin_write" on public.products;
 create policy "products_admin_write"
   on public.products for all
   to authenticated
@@ -119,6 +120,7 @@ create policy "products_admin_write"
   with check (public.can_manage_products());
 
 drop policy if exists "store_auth_write" on public.store_settings;
+drop policy if exists "store_admin_write" on public.store_settings;
 create policy "store_admin_write"
   on public.store_settings for all
   to authenticated

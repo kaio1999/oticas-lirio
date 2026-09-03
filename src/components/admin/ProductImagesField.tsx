@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { ImageCropModal } from "@/components/admin/ImageCropModal";
+import { compressProductImage } from "@/lib/compressProductImage";
 import {
   cropImageStyle,
   defaultCrop,
@@ -66,6 +67,8 @@ export function ProductImagesField({
     index: number;
     src: string;
   } | null>(null);
+  const [optimizing, setOptimizing] = useState(false);
+  const [optimizedHint, setOptimizedHint] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -93,24 +96,35 @@ export function ProductImagesField({
     if (!fileList?.length) return;
     const nextSlots: Slot[] = [];
     const nextCrops: (ImageCrop | null)[] = [];
+    let anyOptimized = false;
 
-    for (const file of Array.from(fileList)) {
-      if (!file.type.startsWith("image/")) continue;
-      if (file.size > 8 * 1024 * 1024) continue;
-      const preview = URL.createObjectURL(file);
-      nextSlots.push({
-        kind: "pending",
-        item: {
-          key: `${file.name}-${file.size}-${file.lastModified}-${Math.random()}`,
-          file,
-          preview,
-        },
-      });
-      nextCrops.push(await loadDefaultCrop(preview));
+    setOptimizing(true);
+    try {
+      for (const raw of Array.from(fileList)) {
+        if (!raw.type.startsWith("image/")) continue;
+        if (raw.size > 8 * 1024 * 1024) continue;
+
+        const { file, optimized } = await compressProductImage(raw);
+        if (optimized) anyOptimized = true;
+
+        const preview = URL.createObjectURL(file);
+        nextSlots.push({
+          kind: "pending",
+          item: {
+            key: `${file.name}-${file.size}-${file.lastModified}-${Math.random()}`,
+            file,
+            preview,
+          },
+        });
+        nextCrops.push(await loadDefaultCrop(preview));
+      }
+
+      setSlots((prev) => [...prev, ...nextSlots].slice(0, 12));
+      setCrops((prev) => [...prev, ...nextCrops].slice(0, 12));
+      if (anyOptimized) setOptimizedHint(true);
+    } finally {
+      setOptimizing(false);
     }
-
-    setSlots((prev) => [...prev, ...nextSlots].slice(0, 12));
-    setCrops((prev) => [...prev, ...nextCrops].slice(0, 12));
   }
 
   function removeAt(index: number) {
@@ -278,6 +292,7 @@ export function ProductImagesField({
         <button
           type="button"
           className="btn btn-secondary !min-h-10 !px-4 !text-sm"
+          disabled={optimizing}
           onClick={() => cameraRef.current?.click()}
         >
           Tirar foto
@@ -285,11 +300,22 @@ export function ProductImagesField({
         <button
           type="button"
           className="btn btn-secondary !min-h-10 !px-4 !text-sm"
+          disabled={optimizing}
           onClick={() => galleryRef.current?.click()}
         >
           Enviar da galeria
         </button>
       </div>
+
+      {optimizing ? (
+        <p className="text-xs text-ink-muted">Otimizando foto para envio…</p>
+      ) : null}
+      {optimizedHint && !optimizing ? (
+        <p className="rounded-xl bg-sand/80 px-3 py-2 text-xs text-ink-muted">
+          Foto otimizada para envio — fica mais leve e falha menos em internet
+          fraca.
+        </p>
+      ) : null}
 
       <input
         id={cameraId}
@@ -451,14 +477,16 @@ export function ProductFormShell({
                 className="inline-block size-4 animate-spin rounded-full border-2 border-current border-r-transparent"
                 aria-hidden
               />
-              Salvando…
+              Enviando fotos… Pode demorar um pouco.
             </span>
           ) : (
             submitLabel
           )}
         </button>
       ) : pending ? (
-        <p className="text-sm text-ink-muted">Salvando…</p>
+        <p className="text-sm text-ink-muted">
+          Enviando fotos… Pode demorar um pouco.
+        </p>
       ) : null}
     </form>
   );

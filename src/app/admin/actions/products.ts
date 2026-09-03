@@ -113,12 +113,27 @@ function parseProductFields(formData: FormData) {
   };
 }
 
+async function sleep(ms: number) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isRetryableUploadError(message: string): boolean {
+  const lower = message.toLowerCase();
+  if (lower.includes("máximo 8 mb") || lower.includes("8 mb")) return false;
+  if (lower.includes("envie apenas")) return false;
+  if (lower.includes("too large") || lower.includes("payload")) return false;
+  if (lower.includes("mime") || lower.includes("invalid content")) return false;
+  return true;
+}
+
 async function uploadPhotos(
   supabase: NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>,
   productId: string,
   files: File[],
 ): Promise<string[]> {
   const urls: string[] = [];
+  const maxAttempts = 3;
+  const backoffs = [500, 1500];
 
   for (const file of files) {
     if (!file || file.size === 0) continue;
@@ -129,20 +144,38 @@ async function uploadPhotos(
       throw new Error("Envie apenas arquivos de imagem.");
     }
 
-    const path = `${productId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extensionFor(file)}`;
     const buffer = Buffer.from(await file.arrayBuffer());
+    let lastError = "Falha ao enviar a foto.";
 
-    const { error } = await supabase.storage.from(BUCKET).upload(path, buffer, {
-      contentType: file.type || "image/jpeg",
-      upsert: false,
-    });
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const path = `${productId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extensionFor(file)}`;
+      const { error } = await supabase.storage.from(BUCKET).upload(path, buffer, {
+        contentType: file.type || "image/jpeg",
+        upsert: false,
+      });
 
-    if (error) {
-      throw new Error(error.message);
+      if (!error) {
+        const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+        urls.push(data.publicUrl);
+        lastError = "";
+        break;
+      }
+
+      lastError = error.message;
+      const retryable = isRetryableUploadError(lastError);
+      if (!retryable || attempt === maxAttempts) {
+        break;
+      }
+      await sleep(backoffs[attempt - 1] ?? 1500);
     }
 
-    const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
-    urls.push(data.publicUrl);
+    if (lastError) {
+      throw new Error(
+        isRetryableUploadError(lastError)
+          ? "Não foi possível enviar a foto (internet instável). Tente de novo."
+          : lastError,
+      );
+    }
   }
 
   return urls;
