@@ -1,4 +1,6 @@
 import type { Product, ProductCategory, ProductShape } from "@/types/product";
+import type { ImageCrop } from "@/lib/productImageCrop";
+import { normalizeCrop } from "@/lib/productImageCrop";
 import type { StoreInfo } from "@/types/store";
 
 export type ProductRow = {
@@ -9,6 +11,7 @@ export type ProductRow = {
   price: number;
   promo_price?: number | null;
   images: string[];
+  image_crops?: ImageCrop[] | null;
   model_3d_url: string | null;
   shape: ProductShape;
   material: string;
@@ -25,7 +28,7 @@ export type ProductRow = {
 
 /** Colunas da vitrine — sem SKU/medidas. */
 export const PRODUCT_PUBLIC_COLUMNS =
-  "id, name, brand, category, price, promo_price, images, model_3d_url, shape, material, colors, in_stock, description, featured";
+  "id, name, brand, category, price, promo_price, images, image_crops, model_3d_url, shape, material, colors, in_stock, description, featured";
 
 export const PRODUCT_ADMIN_COLUMNS = `${PRODUCT_PUBLIC_COLUMNS}, sku, lens_width_mm, bridge_mm, temple_mm, frame_width_mm`;
 
@@ -55,6 +58,14 @@ function optionalMm(value: number | null | undefined): number | null | undefined
   return Number.isFinite(n) ? n : null;
 }
 
+function mapImageCrops(raw: unknown): ImageCrop[] | undefined {
+  if (!Array.isArray(raw) || raw.length === 0) return undefined;
+  const crops = raw
+    .map((item) => normalizeCrop(item))
+    .filter(Boolean) as ImageCrop[];
+  return crops.length > 0 ? crops : undefined;
+}
+
 export function mapProductRow(row: ProductRow): Product {
   return {
     id: row.id,
@@ -67,6 +78,7 @@ export function mapProductRow(row: ProductRow): Product {
         ? null
         : Number(row.promo_price),
     images: row.images ?? [],
+    imageCrops: mapImageCrops(row.image_crops),
     model3dUrl: row.model_3d_url ?? undefined,
     shape: row.shape,
     material: row.material,

@@ -59,6 +59,7 @@ export default async function ProdutoDetalhePage({
       <div className="mt-6 grid gap-10 lg:grid-cols-2 lg:items-start">
         <ProductGallery
           images={product.images}
+          imageCrops={product.imageCrops}
           alt={title}
           priority
           product={product}

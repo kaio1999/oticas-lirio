@@ -1,3 +1,7 @@
+import type { ImageCrop } from "@/lib/productImageCrop";
+
+export type { ImageCrop };
+
 export type ProductCategory = "grau" | "sol" | "infantil" | "acessorio";
 
 export type ProductShape =
@@ -17,6 +21,8 @@ export type Product = {
   /** Preço promocional (para). Se menor que price, vitrine mostra de/para. */
   promoPrice?: number | null;
   images: string[];
+  /** Enquadramento por foto (mesma ordem de images). */
+  imageCrops?: ImageCrop[];
   model3dUrl?: string;
   shape: ProductShape;
   material: string;

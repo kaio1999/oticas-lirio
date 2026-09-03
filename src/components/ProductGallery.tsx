@@ -1,12 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
+import { ProductImage } from "@/components/ProductImage";
 import { ProductStatusBadge } from "@/components/ProductStatusBadge";
-import type { Product } from "@/types/product";
+import { cropForIndex } from "@/lib/productImageCrop";
+import type { ImageCrop, Product } from "@/types/product";
 
 type Props = {
   images: string[];
+  imageCrops?: ImageCrop[];
   alt: string;
   priority?: boolean;
   /** Dados para badge de status na capa. */
@@ -16,6 +18,7 @@ type Props = {
 /** Galeria: capa em destaque + miniaturas de todas as fotos. */
 export function ProductGallery({
   images,
+  imageCrops,
   alt,
   priority = false,
   product,
@@ -28,12 +31,12 @@ export function ProductGallery({
   return (
     <div className="space-y-3">
       <div className="relative aspect-[8/5] overflow-hidden rounded-[2rem] border border-line bg-mist-deep">
-        <Image
+        <ProductImage
           src={current}
           alt={alt}
-          fill
+          crop={cropForIndex(imageCrops, active)}
           priority={priority}
-          className="object-cover"
+          containerClassName="absolute inset-0"
           sizes="(max-width: 1024px) 100vw, 50vw"
         />
         {product ? (
@@ -62,11 +65,11 @@ export function ProductGallery({
               }`}
               aria-label={`Foto ${i + 1}`}
             >
-              <Image
+              <ProductImage
                 src={src}
                 alt=""
-                fill
-                className="object-cover"
+                crop={cropForIndex(imageCrops, i)}
+                containerClassName="absolute inset-0"
                 sizes="80px"
               />
             </button>

@@ -268,6 +268,7 @@ export function ProductForm({ action, product, submitLabel, error }: Props) {
 
       <ProductImagesField
         initialImages={product?.images ?? []}
+        initialCrops={product?.imageCrops ?? []}
         required={isCreate}
       />
 

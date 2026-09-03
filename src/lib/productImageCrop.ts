@@ -1,0 +1,176 @@
+import type { CSSProperties } from "react";
+
+/** Recorte normalizado (0–1) relativo à imagem original. Proporção alvo da vitrine: 8/5. */
+export type ImageCrop = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export const VITRINE_ASPECT = 8 / 5;
+
+export function normalizeCrop(raw: unknown): ImageCrop | null {
+  if (!raw || typeof raw !== "object") return null;
+  const o = raw as Record<string, unknown>;
+  const x = Number(o.x);
+  const y = Number(o.y);
+  const width = Number(o.width);
+  const height = Number(o.height);
+  if (
+    !Number.isFinite(x) ||
+    !Number.isFinite(y) ||
+    !Number.isFinite(width) ||
+    !Number.isFinite(height) ||
+    width <= 0 ||
+    height <= 0 ||
+    x < 0 ||
+    y < 0 ||
+    x + width > 1.001 ||
+    y + height > 1.001
+  ) {
+    return null;
+  }
+  return {
+    x: clamp01(x),
+    y: clamp01(y),
+    width: clamp01(width),
+    height: clamp01(height),
+  };
+}
+
+function clamp01(n: number) {
+  return Math.min(1, Math.max(0, n));
+}
+
+/** Maior retângulo 8:5 centralizado dentro da imagem. */
+export function defaultCrop(
+  imageWidth: number,
+  imageHeight: number,
+  aspect = VITRINE_ASPECT,
+): ImageCrop {
+  if (imageWidth <= 0 || imageHeight <= 0) {
+    return { x: 0, y: 0, width: 1, height: 1 };
+  }
+  const imageAspect = imageWidth / imageHeight;
+  if (imageAspect > aspect) {
+    const height = 1;
+    const width = (aspect * imageHeight) / imageWidth;
+    return { x: (1 - width) / 2, y: 0, width, height };
+  }
+  const width = 1;
+  const height = imageWidth / (aspect * imageHeight);
+  return { x: 0, y: (1 - height) / 2, width, height };
+}
+
+export function cropForIndex(
+  crops: (ImageCrop | null | undefined)[] | undefined,
+  index: number,
+): ImageCrop | null {
+  if (!crops?.length) return null;
+  return normalizeCrop(crops[index]) ?? null;
+}
+
+
+export function cropImageStyle(crop: ImageCrop): CSSProperties {
+  return {
+    position: "absolute",
+    width: `${100 / crop.width}%`,
+    height: `${100 / crop.height}%`,
+    left: `${(-crop.x / crop.width) * 100}%`,
+    top: `${(-crop.y / crop.height) * 100}%`,
+    maxWidth: "none",
+  };
+}
+
+export function parseImageCropsJson(raw: string): ImageCrop[] {
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((item) => normalizeCrop(item)).filter(Boolean) as ImageCrop[];
+  } catch {
+    return [];
+  }
+}
+
+/** Converte recorte normalizado em pan/zoom na viewport do editor. */
+export function cropToTransform(
+  crop: ImageCrop,
+  iw: number,
+  ih: number,
+  vw: number,
+  vh: number,
+): { scale: number; panX: number; panY: number } {
+  const coverScale = Math.max(vw / iw, vh / ih);
+  const cropW = crop.width * iw;
+  const cropH = crop.height * ih;
+  const scale = Math.max(coverScale, Math.max(vw / cropW, vh / cropH));
+  const displayW = iw * scale;
+  const displayH = ih * scale;
+  const panX = -crop.x * iw * scale;
+  const panY = -crop.y * ih * scale;
+  return clampPan(scale, panX, panY, displayW, displayH, vw, vh);
+}
+
+/** Converte pan/zoom da viewport em recorte normalizado. */
+export function transformToCrop(
+  scale: number,
+  panX: number,
+  panY: number,
+  iw: number,
+  ih: number,
+  vw: number,
+  vh: number,
+): ImageCrop {
+  const displayW = iw * scale;
+  const displayH = ih * scale;
+  const srcLeft = clamp(0, -panX / scale, iw);
+  const srcTop = clamp(0, -panY / scale, ih);
+  const srcWidth = clamp(vw / scale, iw - srcLeft, iw);
+  const srcHeight = clamp(vh / scale, ih - srcTop, ih);
+  return {
+    x: srcLeft / iw,
+    y: srcTop / ih,
+    width: srcWidth / iw,
+    height: srcHeight / ih,
+  };
+}
+
+export function clampPan(
+  scale: number,
+  panX: number,
+  panY: number,
+  displayW: number,
+  displayH: number,
+  vw: number,
+  vh: number,
+) {
+  const minPanX = Math.min(0, vw - displayW);
+  const minPanY = Math.min(0, vh - displayH);
+  return {
+    scale,
+    panX: clamp(minPanX, panX, 0),
+    panY: clamp(minPanY, panY, 0),
+  };
+}
+
+function clamp(min: number, value: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+/** Alinha recortes à ordem final das imagens (mesma lógica de resolveImages). */
+export function mergeImageCrops(
+  keptCrops: ImageCrop[],
+  pendingCrops: ImageCrop[],
+  uploadedCount: number,
+  coverPending: boolean,
+): ImageCrop[] {
+  if (coverPending && uploadedCount > 0) {
+    return [
+      pendingCrops[0] ?? { x: 0, y: 0, width: 1, height: 1 },
+      ...keptCrops,
+      ...pendingCrops.slice(1),
+    ];
+  }
+  return [...keptCrops, ...pendingCrops];
+}

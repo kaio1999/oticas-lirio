@@ -1,10 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { ProductImage } from "@/components/ProductImage";
 import { ProductPrice } from "@/components/ProductPrice";
 import { ProductStatusBadge } from "@/components/ProductStatusBadge";
+import { cropForIndex } from "@/lib/productImageCrop";
 import {
   categoryLabels,
   productDisplayName,
@@ -34,13 +35,13 @@ export function ProductCard({ product, priority = false }: Props) {
       className="group block h-full overflow-hidden rounded-2xl border border-line bg-white shadow-[0_10px_30px_#12121208] transition duration-300 hover:border-brand/35 hover:shadow-[0_22px_44px_#00b7c818]"
     >
       <div className="relative aspect-[8/5] overflow-hidden bg-sand">
-        <Image
+        <ProductImage
           src={current}
           alt={title}
-          fill
+          crop={cropForIndex(product.imageCrops, index)}
           priority={priority}
-          loading={priority ? "eager" : "lazy"}
-          className="object-cover transition duration-500 group-hover:scale-[1.03]"
+          containerClassName="absolute inset-0"
+          className="transition duration-500 group-hover:scale-[1.03]"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
         />
         <div className="absolute left-3 top-3">

@@ -8,6 +8,11 @@ import {
   slugifyProductId,
 } from "@/lib/admin/productId";
 import { parseBRLCurrency } from "@/lib/format";
+import {
+  mergeImageCrops,
+  parseImageCropsJson,
+  type ImageCrop,
+} from "@/lib/productImageCrop";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { ProductCategory, ProductShape } from "@/types/product";
 import { revalidatePath, revalidateTag } from "next/cache";
@@ -143,13 +148,43 @@ async function uploadPhotos(
   return urls;
 }
 
-async function resolveImages(
+function parseCropsFromForm(formData: FormData) {
+  const keptCrops = parseImageCropsJson(
+    String(formData.get("imageCropsKept") || "[]"),
+  );
+  const pendingCrops = parseImageCropsJson(
+    String(formData.get("imageCropsPending") || "[]"),
+  );
+  return { keptCrops, pendingCrops };
+}
+
+function alignCropsToImages(
+  images: string[],
+  crops: ImageCrop[],
+): ImageCrop[] {
+  if (crops.length === 0) return [];
+  if (crops.length >= images.length) {
+    return crops.slice(0, images.length);
+  }
+  return [
+    ...crops,
+    ...Array.from({ length: images.length - crops.length }, () => ({
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 1,
+    })),
+  ];
+}
+
+async function resolveImagesAndCrops(
   supabase: NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>,
   productId: string,
   formData: FormData,
   previousImages: string[] = [],
+  previousCrops: ImageCrop[] = [],
   options: { requireAtLeastOne?: boolean } = {},
-): Promise<string[]> {
+): Promise<{ images: string[]; imageCrops: ImageCrop[] }> {
   const kept = formData
     .getAll("keptImages")
     .map((v) => String(v).trim())
@@ -166,20 +201,40 @@ async function resolveImages(
   });
 
   const coverPending = String(formData.get("coverPending") || "") === "1";
+  const { keptCrops, pendingCrops } = parseCropsFromForm(formData);
   const uploaded = await uploadPhotos(supabase, productId, photos);
 
-  // Capa = 1ª imagem. Se a capa for foto nova, ela sobe para o início.
-  let next: string[];
+  let images: string[];
   if (coverPending && uploaded.length > 0) {
-    next = [uploaded[0]!, ...kept, ...uploaded.slice(1)];
+    images = [uploaded[0]!, ...kept, ...uploaded.slice(1)];
   } else {
-    next = [...kept, ...uploaded];
+    images = [...kept, ...uploaded];
+  }
+
+  let imageCrops = mergeImageCrops(
+    keptCrops,
+    pendingCrops,
+    uploaded.length,
+    coverPending,
+  );
+
+  if (imageCrops.length === 0 && previousCrops.length > 0) {
+    const keptIndexMap = kept.map((url) => previousImages.indexOf(url));
+    imageCrops = keptIndexMap
+      .filter((i) => i >= 0)
+      .map((i) => previousCrops[i])
+      .filter(Boolean) as ImageCrop[];
+    if (coverPending && uploaded.length > 0 && pendingCrops[0]) {
+      imageCrops = [pendingCrops[0], ...imageCrops, ...pendingCrops.slice(1)];
+    } else {
+      imageCrops = [...imageCrops, ...pendingCrops];
+    }
   }
 
   const removed = previousImages.filter(
     (url) =>
       url.includes(`/storage/v1/object/public/${BUCKET}/`) &&
-      !next.includes(url),
+      !images.includes(url),
   );
   const paths = removed
     .map(storagePathFromPublicUrl)
@@ -189,14 +244,21 @@ async function resolveImages(
     await supabase.storage.from(BUCKET).remove(paths);
   }
 
-  const real = next.filter((url) => !url.includes("placeholder-"));
+  const real = images.filter((url) => !url.includes("placeholder-"));
   if (real.length === 0) {
     if (options.requireAtLeastOne) {
       throw new Error("foto");
     }
-    return ["/products/placeholder-aviador.svg"];
+    return {
+      images: ["/products/placeholder-aviador.svg"],
+      imageCrops: [],
+    };
   }
-  return real;
+
+  return {
+    images: real,
+    imageCrops: alignCropsToImages(real, imageCrops),
+  };
 }
 
 export async function createProductAction(formData: FormData) {
@@ -222,10 +284,16 @@ export async function createProductAction(formData: FormData) {
   }
 
   let images: string[];
+  let imageCrops: ImageCrop[];
   try {
-    images = await resolveImages(supabase, id, formData, [], {
-      requireAtLeastOne: true,
-    });
+    ({ images, imageCrops } = await resolveImagesAndCrops(
+      supabase,
+      id,
+      formData,
+      [],
+      [],
+      { requireAtLeastOne: true },
+    ));
   } catch (e) {
     failProduto(
       "/admin/produtos/novo",
@@ -237,6 +305,7 @@ export async function createProductAction(formData: FormData) {
     id,
     ...fields,
     images,
+    image_crops: imageCrops,
   });
 
   if (error) {
@@ -268,15 +337,24 @@ export async function updateProductAction(formData: FormData) {
 
   const { data: current } = await supabase
     .from("products")
-    .select("images")
+    .select("images, image_crops")
     .eq("id", id)
     .maybeSingle();
 
   const previousImages = (current?.images as string[] | undefined) ?? [];
+  const previousCrops =
+    (current?.image_crops as ImageCrop[] | undefined) ?? [];
 
   let images: string[];
+  let imageCrops: ImageCrop[];
   try {
-    images = await resolveImages(supabase, id, formData, previousImages);
+    ({ images, imageCrops } = await resolveImagesAndCrops(
+      supabase,
+      id,
+      formData,
+      previousImages,
+      previousCrops,
+    ));
   } catch (e) {
     failProduto(
       adminProductPath(id),
@@ -286,7 +364,7 @@ export async function updateProductAction(formData: FormData) {
 
   const { error } = await supabase
     .from("products")
-    .update({ ...fields, images })
+    .update({ ...fields, images, image_crops: imageCrops })
     .eq("id", id);
 
   if (error) {
