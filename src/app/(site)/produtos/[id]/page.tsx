@@ -8,6 +8,7 @@ import { decodeProductIdParam } from "@/lib/admin/productId";
 import {
   categoryLabels,
   productDisplayName,
+  productGenderLabel,
   shapeLabels,
 } from "@/lib/format";
 import { whatsappUrl } from "@/lib/whatsapp";
@@ -67,7 +68,8 @@ export default async function ProdutoDetalhePage({
 
         <div>
           <p className="text-xs uppercase tracking-[0.16em] text-ink-muted">
-            {categoryLabels[product.category]} · {shapeLabels[product.shape]}
+            {categoryLabels[product.category]} · {shapeLabels[product.shape]} ·{" "}
+            {productGenderLabel(product.gender)}
           </p>
           <h1 className="mt-2 font-display text-4xl text-brand sm:text-5xl">
             {title}
@@ -80,6 +82,14 @@ export default async function ProdutoDetalhePage({
           <p className="mt-5 max-w-lg text-ink-muted">{product.description}</p>
 
           <dl className="mt-8 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl border border-line bg-white/60 p-4">
+              <dt className="text-xs uppercase tracking-[0.12em] text-ink-muted">
+                Gênero
+              </dt>
+              <dd className="mt-1 text-brand">
+                {productGenderLabel(product.gender)}
+              </dd>
+            </div>
             <div className="rounded-2xl border border-line bg-white/60 p-4">
               <dt className="text-xs uppercase tracking-[0.12em] text-ink-muted">
                 Material

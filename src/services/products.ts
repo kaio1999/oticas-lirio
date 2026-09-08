@@ -1,9 +1,15 @@
 import { products as mockProducts } from "@/data/products";
 import { productEffectivePrice, productHasPromo } from "@/lib/format";
 import { createSupabaseServerClient } from "@/lib/supabase/client";
-import { mapProductRow, PRODUCT_PUBLIC_COLUMNS, type ProductRow } from "@/lib/supabase/mappers";
-import type { Product, ProductCategory, ProductShape } from "@/types/product";
+import { mapProductRow, PRODUCT_PUBLIC_COLUMNS, PRODUCT_PUBLIC_COLUMNS_LEGACY, type ProductRow } from "@/lib/supabase/mappers";
+import type {
+  Product,
+  ProductCategory,
+  ProductGender,
+  ProductShape,
+} from "@/types/product";
 import { unstable_cache } from "next/cache";
+import { resolveProductGender } from "@/lib/format";
 
 export type CatalogSort =
   | "nome"
@@ -16,6 +22,7 @@ export type ProductFilters = {
   query?: string;
   category?: ProductCategory | "todos";
   shape?: ProductShape | "todos";
+  gender?: ProductGender | "todos";
   brand?: string | "todos";
   material?: string | "todos";
   minPrice?: number;
@@ -74,6 +81,12 @@ function applyFilters(list: Product[], filters: ProductFilters): Product[] {
     result = result.filter((p) => p.shape === filters.shape);
   }
 
+  if (filters.gender && filters.gender !== "todos") {
+    result = result.filter(
+      (p) => resolveProductGender(p.gender) === filters.gender,
+    );
+  }
+
   if (filters.brand && filters.brand !== "todos") {
     result = result.filter(
       (p) => p.brand.toLowerCase() === filters.brand!.toLowerCase(),
@@ -113,17 +126,37 @@ async function fetchAllProductsUncached(): Promise<Product[] | null> {
   const supabase = createSupabaseServerClient();
   if (!supabase) return null;
 
-  const { data, error } = await supabase
+  const primary = await supabase
     .from("products")
     .select(PRODUCT_PUBLIC_COLUMNS)
     .order("name", { ascending: true });
 
-  if (error) {
-    console.error("[products] Supabase error:", error.message);
-    return null;
+  if (!primary.error) {
+    return (primary.data as ProductRow[]).map(mapProductRow);
   }
 
-  return (data as ProductRow[]).map(mapProductRow);
+  const missingGender =
+    /gender/i.test(primary.error.message) ||
+    /column .* does not exist/i.test(primary.error.message);
+
+  if (missingGender) {
+    console.warn(
+      "[products] Coluna gender ausente — usando fallback. Rode supabase/products-gender.sql",
+    );
+    const legacy = await supabase
+      .from("products")
+      .select(PRODUCT_PUBLIC_COLUMNS_LEGACY)
+      .order("name", { ascending: true });
+
+    if (legacy.error) {
+      console.error("[products] Supabase error:", legacy.error.message);
+      return null;
+    }
+    return (legacy.data as ProductRow[]).map(mapProductRow);
+  }
+
+  console.error("[products] Supabase error:", primary.error.message);
+  return null;
 }
 
 const getCachedProducts = unstable_cache(

@@ -1,6 +1,12 @@
-import type { Product, ProductCategory, ProductShape } from "@/types/product";
+import type {
+  Product,
+  ProductCategory,
+  ProductGender,
+  ProductShape,
+} from "@/types/product";
 import type { ImageCrop } from "@/lib/productImageCrop";
 import { normalizeCrop } from "@/lib/productImageCrop";
+import { resolveProductGender } from "@/lib/format";
 import type { StoreInfo } from "@/types/store";
 
 export type ProductRow = {
@@ -14,6 +20,7 @@ export type ProductRow = {
   image_crops?: ImageCrop[] | null;
   model_3d_url: string | null;
   shape: ProductShape;
+  gender?: ProductGender | null;
   material: string;
   colors: string[];
   in_stock: boolean;
@@ -28,9 +35,15 @@ export type ProductRow = {
 
 /** Colunas da vitrine — sem SKU/medidas. */
 export const PRODUCT_PUBLIC_COLUMNS =
+  "id, name, brand, category, price, promo_price, images, image_crops, model_3d_url, shape, gender, material, colors, in_stock, description, featured";
+
+/** Fallback se a coluna gender ainda não existir no banco. */
+export const PRODUCT_PUBLIC_COLUMNS_LEGACY =
   "id, name, brand, category, price, promo_price, images, image_crops, model_3d_url, shape, material, colors, in_stock, description, featured";
 
 export const PRODUCT_ADMIN_COLUMNS = `${PRODUCT_PUBLIC_COLUMNS}, sku, lens_width_mm, bridge_mm, temple_mm, frame_width_mm`;
+
+export const PRODUCT_ADMIN_COLUMNS_LEGACY = `${PRODUCT_PUBLIC_COLUMNS_LEGACY}, sku, lens_width_mm, bridge_mm, temple_mm, frame_width_mm`;
 
 export type StoreSettingsRow = {
   id: number;
@@ -81,6 +94,7 @@ export function mapProductRow(row: ProductRow): Product {
     imageCrops: mapImageCrops(row.image_crops),
     model3dUrl: row.model_3d_url ?? undefined,
     shape: row.shape,
+    gender: resolveProductGender(row.gender),
     material: row.material,
     colors: row.colors ?? [],
     inStock: row.in_stock,

@@ -77,3 +77,25 @@ export const shapeLabels: Record<string, string> = {
   retangular: "Retangular",
   outro: "Outro",
 };
+
+export const genderLabels: Record<string, string> = {
+  feminino: "Feminino",
+  masculino: "Masculino",
+  unissex: "Unissex",
+};
+
+/** Normaliza gênero ausente/inválido para unissex (produtos antigos). */
+export function resolveProductGender(
+  value: string | null | undefined,
+): "feminino" | "masculino" | "unissex" {
+  if (value === "feminino" || value === "masculino" || value === "unissex") {
+    return value;
+  }
+  return "unissex";
+}
+
+export function productGenderLabel(
+  value: string | null | undefined,
+): string {
+  return genderLabels[resolveProductGender(value)];
+}

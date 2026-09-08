@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { CatalogFilters } from "@/features/catalog/CatalogFilters";
-import type { ProductCategory, ProductShape } from "@/types/product";
+import type { ProductCategory, ProductGender, ProductShape } from "@/types/product";
 import {
   type CatalogSort,
   getBrands,
@@ -22,6 +22,7 @@ type SearchParams = Promise<{
   q?: string;
   categoria?: string;
   formato?: string;
+  genero?: string;
   marca?: string;
   material?: string;
   precoMin?: string;
@@ -62,6 +63,7 @@ export default async function ProdutosPage({
     query: params.q,
     category: (params.categoria as ProductCategory | "todos") || "todos",
     shape: (params.formato as ProductShape | "todos") || "todos",
+    gender: (params.genero as ProductGender | "todos") || "todos",
     brand: params.marca || "todos",
     material: params.material || "todos",
     minPrice: Number.isFinite(minPrice) ? minPrice : undefined,
@@ -81,8 +83,8 @@ export default async function ProdutosPage({
           Encontre o seu próximo olhar
         </h1>
         <p className="mt-3 text-ink-muted">
-          Filtre por marca, promoção, categoria e faixa de preço — e ordene como
-          preferir. Os valores são referência; confirme na loja.
+          Filtre por marca, gênero, promoção, categoria e faixa de preço — e
+          ordene como preferir. Os valores são referência; confirme na loja.
         </p>
       </div>
 

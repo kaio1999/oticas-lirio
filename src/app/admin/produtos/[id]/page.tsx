@@ -7,6 +7,7 @@ import { translateAdminError } from "@/lib/admin/errors";
 import { decodeProductIdParam } from "@/lib/admin/productId";
 import {
   PRODUCT_ADMIN_COLUMNS,
+  PRODUCT_ADMIN_COLUMNS_LEGACY,
   mapProductRow,
   type ProductRow,
 } from "@/lib/supabase/mappers";
@@ -29,13 +30,21 @@ export default async function EditarProdutoPage({
   const supabase = await createSupabaseServerClient();
   if (!supabase) notFound();
 
-  const { data } = await supabase
+  let { data, error } = await supabase
     .from("products")
     .select(PRODUCT_ADMIN_COLUMNS)
     .eq("id", id)
     .maybeSingle();
 
-  if (!data) notFound();
+  if (error && /gender/i.test(error.message)) {
+    ({ data, error } = await supabase
+      .from("products")
+      .select(PRODUCT_ADMIN_COLUMNS_LEGACY)
+      .eq("id", id)
+      .maybeSingle());
+  }
+
+  if (error || !data) notFound();
   const product = mapProductRow(data as ProductRow);
   const erroMsg = sp.erro
     ? translateAdminError(decodeURIComponent(sp.erro))

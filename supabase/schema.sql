@@ -16,6 +16,9 @@ create table if not exists public.products (
   shape text not null check (
     shape in ('aviador', 'redondo', 'quadrado', 'gatinho', 'retangular', 'outro')
   ),
+  gender text not null default 'unissex' check (
+    gender in ('feminino', 'masculino', 'unissex')
+  ),
   material text not null,
   colors text[] not null default '{}',
   in_stock boolean not null default true,

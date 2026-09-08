@@ -14,7 +14,11 @@ import {
   type ImageCrop,
 } from "@/lib/productImageCrop";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { ProductCategory, ProductShape } from "@/types/product";
+import type {
+  ProductCategory,
+  ProductGender,
+  ProductShape,
+} from "@/types/product";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -65,6 +69,11 @@ function parseProductFields(formData: FormData) {
   const brand = String(formData.get("brand") || "").trim();
   const category = String(formData.get("category") || "grau") as ProductCategory;
   const shape = String(formData.get("shape") || "outro") as ProductShape;
+  const genderRaw = String(formData.get("gender") || "unissex");
+  const gender: ProductGender =
+    genderRaw === "feminino" || genderRaw === "masculino" || genderRaw === "unissex"
+      ? genderRaw
+      : "unissex";
   const material = String(formData.get("material") || "").trim();
   const price = parseBRLCurrency(String(formData.get("price") || "0"));
   const onPromo = formData.get("onPromo") === "on";
@@ -97,6 +106,7 @@ function parseProductFields(formData: FormData) {
     brand,
     category,
     shape,
+    gender,
     material,
     price,
     promo_price,

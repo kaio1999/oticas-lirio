@@ -20,6 +20,12 @@ Para promoções de/para na vitrine, rode:
 
 (coluna `promo_price` — controlada no admin, aparece no catálogo e na home)
 
+Para gênero (feminino / masculino / unissex), rode:
+
+`supabase/products-gender.sql`
+
+(coluna `gender` — cadastro no admin + filtro opcional no catálogo)
+
 ## 2. Criar a conta da dona
 
 1. **Authentication → Users → Add user**

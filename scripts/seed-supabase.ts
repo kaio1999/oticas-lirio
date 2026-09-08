@@ -38,6 +38,7 @@ async function main() {
     images: p.images,
     model_3d_url: p.model3dUrl ?? null,
     shape: p.shape,
+    gender: p.gender ?? "unissex",
     material: p.material,
     colors: p.colors,
     in_stock: p.inStock,

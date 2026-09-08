@@ -9,6 +9,7 @@ import { cropForIndex } from "@/lib/productImageCrop";
 import {
   categoryLabels,
   productDisplayName,
+  productGenderLabel,
   shapeLabels,
 } from "@/lib/format";
 import { catalogProductPath } from "@/lib/admin/productId";
@@ -79,7 +80,8 @@ export function ProductCard({ product, priority = false }: Props) {
       </div>
       <div className="space-y-1.5 p-4">
         <p className="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-ink-muted">
-          {categoryLabels[product.category]} · {shapeLabels[product.shape]}
+          {categoryLabels[product.category]} · {shapeLabels[product.shape]} ·{" "}
+          {productGenderLabel(product.gender)}
         </p>
         <h3 className="font-display text-2xl text-brand-ink">{title}</h3>
         <ProductPrice

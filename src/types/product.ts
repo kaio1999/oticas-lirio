@@ -12,6 +12,8 @@ export type ProductShape =
   | "retangular"
   | "outro";
 
+export type ProductGender = "feminino" | "masculino" | "unissex";
+
 export type Product = {
   id: string;
   name: string;
@@ -25,6 +27,8 @@ export type Product = {
   imageCrops?: ImageCrop[];
   model3dUrl?: string;
   shape: ProductShape;
+  /** Público do modelo. Ausente/inválido = unissex. */
+  gender?: ProductGender;
   material: string;
   colors: string[];
   inStock: boolean;

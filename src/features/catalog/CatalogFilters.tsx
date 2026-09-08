@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { categoryLabels, formatPrice, shapeLabels } from "@/lib/format";
+import { categoryLabels, formatPrice, genderLabels, shapeLabels } from "@/lib/format";
 import type { CatalogSort } from "@/services/products";
 
 const categories = ["todos", "grau", "sol", "infantil", "acessorio"] as const;
@@ -14,6 +14,7 @@ const shapes = [
   "gatinho",
   "retangular",
 ] as const;
+const genders = ["todos", "feminino", "masculino", "unissex"] as const;
 
 const sortOptions: { value: CatalogSort; label: string }[] = [
   { value: "nome", label: "Nome A–Z" },
@@ -174,6 +175,23 @@ export function CatalogFilters({ materials, brands, priceBounds }: Props) {
           {shapes.map((s) => (
             <option key={s} value={s}>
               {s === "todos" ? "Todos" : shapeLabels[s]}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="block">
+        <span className="mb-1.5 block text-xs uppercase tracking-[0.12em] text-ink-muted">
+          Gênero
+        </span>
+        <select
+          className="w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none ring-brand/30 focus:ring-2"
+          value={searchParams.get("genero") ?? "todos"}
+          onChange={(e) => update("genero", e.target.value)}
+        >
+          {genders.map((g) => (
+            <option key={g} value={g}>
+              {g === "todos" ? "Todos" : genderLabels[g]}
             </option>
           ))}
         </select>

@@ -7,8 +7,8 @@ import {
   ProductFormShell,
   ProductImagesField,
 } from "@/components/admin/ProductImagesField";
-import { productHasPromo } from "@/lib/format";
-import type { Product, ProductCategory, ProductShape } from "@/types/product";
+import { productHasPromo, resolveProductGender } from "@/lib/format";
+import type { Product, ProductCategory, ProductGender, ProductShape } from "@/types/product";
 
 const categories: ProductCategory[] = ["grau", "sol", "infantil", "acessorio"];
 const shapes: ProductShape[] = [
@@ -19,6 +19,12 @@ const shapes: ProductShape[] = [
   "retangular",
   "outro",
 ];
+const genders: ProductGender[] = ["feminino", "masculino", "unissex"];
+const genderOptions: Record<ProductGender, string> = {
+  feminino: "Feminino",
+  masculino: "Masculino",
+  unissex: "Unissex",
+};
 
 type Props = {
   action: (formData: FormData) => Promise<void>;
@@ -158,6 +164,24 @@ export function ProductForm({ action, product, submitLabel, error }: Props) {
               </option>
             ))}
           </select>
+        </label>
+
+        <label className="block text-sm font-medium">
+          Gênero
+          <select
+            name="gender"
+            defaultValue={resolveProductGender(product?.gender)}
+            className="mt-1.5 w-full rounded-xl border border-line px-3 py-2.5"
+          >
+            {genders.map((g) => (
+              <option key={g} value={g}>
+                {genderOptions[g]}
+              </option>
+            ))}
+          </select>
+          <span className="mt-1 block text-xs text-ink-muted">
+            Aparece no catálogo e no filtro da vitrine.
+          </span>
         </label>
 
         <label className="block text-sm font-medium">
