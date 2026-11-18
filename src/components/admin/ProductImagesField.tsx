@@ -6,6 +6,7 @@ import { compressProductImage } from "@/lib/compressProductImage";
 import {
   cropImageStyle,
   defaultCrop,
+  repairCropForVitrine,
   type ImageCrop,
 } from "@/lib/productImageCrop";
 
@@ -27,17 +28,21 @@ type Slot =
   | { kind: "kept"; url: string }
   | { kind: "pending"; item: PendingFile };
 
-function loadDefaultCrop(src: string): Promise<ImageCrop> {
+function loadImageSize(
+  src: string,
+): Promise<{ w: number; h: number } | null> {
   return new Promise((resolve) => {
     const img = new window.Image();
-    img.onload = () => {
-      resolve(defaultCrop(img.naturalWidth, img.naturalHeight));
-    };
-    img.onerror = () => {
-      resolve({ x: 0, y: 0, width: 1, height: 1 });
-    };
+    img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+    img.onerror = () => resolve(null);
     img.src = src;
   });
+}
+
+function loadDefaultCrop(src: string): Promise<ImageCrop> {
+  return loadImageSize(src).then((size) =>
+    size ? defaultCrop(size.w, size.h) : { x: 0, y: 0, width: 1, height: 1 },
+  );
 }
 
 export function ProductImagesField({
@@ -72,23 +77,24 @@ export function ProductImagesField({
 
   useEffect(() => {
     let cancelled = false;
-    async function fillMissingCrops() {
+    async function normalizeInitialCrops() {
       const next = await Promise.all(
         slots.map(async (slot, i) => {
-          if (crops[i]) return crops[i];
           const src = slot.kind === "kept" ? slot.url : slot.item.preview;
-          return loadDefaultCrop(src);
+          const size = await loadImageSize(src);
+          const current = crops[i];
+          if (!size) return current ?? { x: 0, y: 0, width: 1, height: 1 };
+          if (!current) return defaultCrop(size.w, size.h);
+          return repairCropForVitrine(current, size.w, size.h);
         }),
       );
       if (!cancelled) setCrops(next);
     }
-    if (slots.some((_, i) => !crops[i])) {
-      void fillMissingCrops();
-    }
+    if (slots.length > 0) void normalizeInitialCrops();
     return () => {
       cancelled = true;
     };
-    // Preenche recorte padrão só na montagem inicial.
+    // Corrige recortes já gravados só na montagem.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

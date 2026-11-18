@@ -80,6 +80,54 @@ export function cropImageStyle(crop: ImageCrop): CSSProperties {
     left: `${(-crop.x / crop.width) * 100}%`,
     top: `${(-crop.y / crop.height) * 100}%`,
     maxWidth: "none",
+    objectFit: "fill",
+  };
+}
+
+/**
+ * Recortes gravados pelo editor antigo iam até a borda da foto, em vez da
+ * janela 8:5 visível. Com a medida real da imagem, devolve essa janela.
+ */
+export function repairCropForVitrine(
+  crop: ImageCrop,
+  iw: number,
+  ih: number,
+): ImageCrop {
+  if (iw <= 0 || ih <= 0) return crop;
+  const pixelAspect = (crop.width * iw) / (crop.height * ih);
+  if (Math.abs(pixelAspect - VITRINE_ASPECT) / VITRINE_ASPECT < 0.02) {
+    return crop;
+  }
+
+  const hitsRight = crop.x + crop.width >= 0.995;
+  const hitsBottom = crop.y + crop.height >= 0.995;
+  const fullWidth = crop.x <= 0.01 && crop.width >= 0.99;
+  const fullHeight = crop.y <= 0.01 && crop.height >= 0.99;
+
+  if (fullWidth && hitsBottom) {
+    const height = Math.min(1, iw / ih / VITRINE_ASPECT);
+    return { x: 0, y: clamp(0, Math.min(crop.y, 1 - height), 1 - height), width: 1, height };
+  }
+
+  if (fullHeight && hitsRight) {
+    const width = Math.min(1, VITRINE_ASPECT * (ih / iw));
+    return { x: clamp(0, Math.min(crop.x, 1 - width), 1 - width), y: 0, width, height: 1 };
+  }
+
+  const availW = Math.max(0, 1 - crop.x);
+  const availH = Math.max(0, 1 - crop.y);
+  let srcW = availW * iw;
+  let srcH = srcW / VITRINE_ASPECT;
+  if (srcH > availH * ih) {
+    srcH = availH * ih;
+    srcW = srcH * VITRINE_ASPECT;
+  }
+  if (srcW <= 0 || srcH <= 0) return crop;
+  return {
+    x: crop.x,
+    y: crop.y,
+    width: srcW / iw,
+    height: srcH / ih,
   };
 }
 
@@ -122,18 +170,17 @@ export function transformToCrop(
   vw: number,
   vh: number,
 ): ImageCrop {
-  const displayW = iw * scale;
-  const displayH = ih * scale;
   const srcLeft = clamp(0, -panX / scale, iw);
   const srcTop = clamp(0, -panY / scale, ih);
-  const srcWidth = clamp(vw / scale, iw - srcLeft, iw);
-  const srcHeight = clamp(vh / scale, ih - srcTop, ih);
-  return {
-    x: srcLeft / iw,
-    y: srcTop / ih,
-    width: srcWidth / iw,
-    height: srcHeight / ih,
-  };
+  // A janela visível é vw/scale por vh/scale. Não estender até a borda da foto:
+  // clamp() trata o 1º argumento como mínimo, e isso gravava o resto da imagem.
+  let width = Math.min(vw / scale, Math.max(0, iw - srcLeft)) / iw;
+  let height = Math.min(vh / scale, Math.max(0, ih - srcTop)) / ih;
+  const x = srcLeft / iw;
+  const y = srcTop / ih;
+  if (x + width > 1) width = 1 - x;
+  if (y + height > 1) height = 1 - y;
+  return { x, y, width, height };
 }
 
 export function clampPan(

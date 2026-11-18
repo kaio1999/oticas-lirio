@@ -10,13 +10,14 @@
     "generate:logos": "node scripts/generate-logos.mjs",
     "db:seed": "tsx scripts/seed-supabase.ts",
     "db:schema": "echo 'Abra supabase/schema.sql no SQL Editor do Supabase'",
-    "db:clear-products": "tsx scripts/clear-products.ts"
+    "db:clear-products": "tsx scripts/clear-products.ts",
+    "db:recenter-crops": "tsx scripts/recenter-crops.ts"
   },
   "dependencies": {
     "@sentry/nextjs": "^10.70.0",
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.112.2",
-    "next": "16.2.10",
+    "next": "16.4.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
@@ -29,7 +30,7 @@
     "@types/react-dom": "^19",
     "dotenv": "^17.4.2",
     "eslint": "^9",
-    "eslint-config-next": "16.2.10",
+    "eslint-config-next": "16.4.6",
     "tailwindcss": "^4",
     "tsx": "^4.23.9",
     "typescript": "^5"

@@ -1,7 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { cropImageStyle, type ImageCrop } from "@/lib/productImageCrop";
+import { useEffect, useRef, useState } from "react";
+import {
+  cropImageStyle,
+  repairCropForVitrine,
+  type ImageCrop,
+} from "@/lib/productImageCrop";
 
 type Props = {
   src: string;
@@ -28,7 +33,37 @@ export function ProductImage({
   sizes,
   containerClassName = "relative overflow-hidden",
 }: Props) {
+  const cropKey = crop
+    ? `${crop.x},${crop.y},${crop.width},${crop.height}`
+    : "";
+  const cropRef = useRef(crop);
+  cropRef.current = crop;
+  const [framed, setFramed] = useState<ImageCrop | null>(null);
+
+  useEffect(() => {
+    const current = cropRef.current;
+    if (!current) return;
+    let cancelled = false;
+    setFramed(null);
+    const probe = new window.Image();
+    probe.onload = () => {
+      if (!cancelled) {
+        setFramed(
+          repairCropForVitrine(current, probe.naturalWidth, probe.naturalHeight),
+        );
+      }
+    };
+    probe.onerror = () => {
+      if (!cancelled) setFramed(current);
+    };
+    probe.src = src;
+    return () => {
+      cancelled = true;
+    };
+  }, [src, cropKey]);
+
   if (crop) {
+    const applied = framed ?? crop;
     return (
       <div className={containerClassName}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -36,7 +71,10 @@ export function ProductImage({
           src={src}
           alt={alt}
           className={className}
-          style={cropImageStyle(crop)}
+          style={{
+            ...cropImageStyle(applied),
+            opacity: framed ? 1 : 0,
+          }}
           loading={priority ? "eager" : "lazy"}
           decoding="async"
           fetchPriority={priority ? "high" : undefined}

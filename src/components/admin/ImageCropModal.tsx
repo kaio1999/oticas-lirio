@@ -5,6 +5,7 @@ import {
   clampPan,
   cropToTransform,
   defaultCrop,
+  repairCropForVitrine,
   transformToCrop,
   type ImageCrop,
   VITRINE_ASPECT,
@@ -77,7 +78,8 @@ export function ImageCropModal({
       return;
     }
     const base = minScale();
-    const crop = initialCrop ?? defaultCrop(natural.w, natural.h, VITRINE_ASPECT);
+    const raw = initialCrop ?? defaultCrop(natural.w, natural.h, VITRINE_ASPECT);
+    const crop = repairCropForVitrine(raw, natural.w, natural.h);
     const t = cropToTransform(crop, natural.w, natural.h, viewport.w, viewport.h);
     const nextScale = Math.max(base, t.scale);
     applyPan(nextScale, t.panX, t.panY);

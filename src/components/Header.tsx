@@ -11,7 +11,7 @@ const links = [
 /** Header server-side — JS só no menu mobile e no link Contato (analytics). */
 export function Header() {
   return (
-    <header className="relative sticky top-0 z-50 border-b border-line bg-[#faf9f7] md:bg-[#faf9f7e6] md:backdrop-blur-md">
+    <header className="relative sticky top-0 z-50 border-b border-line bg-[#f8f6f2] md:bg-[#f8f6f2e6] md:backdrop-blur-md">
       <div className="container-page flex items-center justify-between gap-4 py-3">
         <Link href="/" className="group flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}

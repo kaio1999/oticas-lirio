@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { ProductCard } from "@/components/ProductCard";
 import { CatalogFilters } from "@/features/catalog/CatalogFilters";
+import { CatalogGrid } from "@/features/catalog/CatalogGrid";
 import type { ProductCategory, ProductGender, ProductShape } from "@/types/product";
 import {
   type CatalogSort,
@@ -100,11 +100,6 @@ export default async function ProdutosPage({
         </Suspense>
       </div>
 
-      <p className="mt-6 text-sm text-ink-muted">
-        {products.length}{" "}
-        {products.length === 1 ? "modelo encontrado" : "modelos encontrados"}
-      </p>
-
       {products.length === 0 ? (
         <div className="mt-8 rounded-3xl border border-dashed border-line bg-white/50 px-6 py-16 text-center">
           <p className="font-display text-3xl text-brand">
@@ -115,11 +110,7 @@ export default async function ProdutosPage({
           </p>
         </div>
       ) : (
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <CatalogGrid products={products} />
       )}
     </div>
   );

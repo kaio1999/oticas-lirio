@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ProductImage } from "@/components/ProductImage";
+import { useHorizontalSwipe } from "@/lib/useHorizontalSwipe";
 import { ProductStatusBadge } from "@/components/ProductStatusBadge";
 import { cropForIndex } from "@/lib/productImageCrop";
 import type { ImageCrop, Product } from "@/types/product";
@@ -27,6 +28,9 @@ export function ProductGallery({
     images.length > 0 ? images : ["/products/placeholder-aviador.svg"];
   const [active, setActive] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const swipe = useHorizontalSwipe(list.length > 1, (direction) => {
+    setActive((i) => (i + direction + list.length) % list.length);
+  });
   const current = list[Math.min(active, list.length - 1)]!;
   const hasMany = list.length > 1;
 
@@ -65,6 +69,11 @@ export function ProductGallery({
       <button
         type="button"
         onClick={() => setLightboxOpen(true)}
+        onClickCapture={swipe.consumeClick}
+        onPointerDown={swipe.onPointerDown}
+        onPointerUp={swipe.onPointerUp}
+        onPointerCancel={swipe.onPointerCancel}
+        style={{ touchAction: hasMany ? "pan-y" : undefined }}
         className="group relative block w-full cursor-zoom-in overflow-hidden rounded-[2rem] border border-line bg-mist-deep text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
         aria-label={`Ampliar foto: ${alt}`}
       >
@@ -166,7 +175,13 @@ export function ProductGallery({
               </button>
             ) : null}
 
-            <div className="relative w-full max-w-5xl overflow-hidden rounded-2xl bg-black/30 shadow-2xl aspect-[8/5] ring-1 ring-white/10">
+            <div
+              className="relative w-full max-w-5xl overflow-hidden rounded-2xl bg-black/30 shadow-2xl aspect-[8/5] ring-1 ring-white/10"
+              style={{ touchAction: hasMany ? "pan-y" : undefined }}
+              onPointerDown={swipe.onPointerDown}
+              onPointerUp={swipe.onPointerUp}
+              onPointerCancel={swipe.onPointerCancel}
+            >
               <ProductImage
                 src={current}
                 alt={alt}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ProductImage } from "@/components/ProductImage";
+import { useHorizontalSwipe } from "@/lib/useHorizontalSwipe";
 import { ProductPrice } from "@/components/ProductPrice";
 import { ProductStatusBadge } from "@/components/ProductStatusBadge";
 import { cropForIndex } from "@/lib/productImageCrop";
@@ -29,13 +30,23 @@ export function ProductCard({ product, priority = false }: Props) {
   const [index, setIndex] = useState(0);
   const current = images[Math.min(index, images.length - 1)]!;
   const title = productDisplayName(product.name, product.brand);
+  const swipe = useHorizontalSwipe(images.length > 1, (direction) => {
+    setIndex((i) => (i + direction + images.length) % images.length);
+  });
 
   return (
     <Link
       href={catalogProductPath(product.id)}
+      onClickCapture={swipe.consumeClick}
       className="group block h-full overflow-hidden rounded-2xl border border-line bg-white shadow-[0_10px_30px_#12121208] transition duration-300 hover:border-brand/35 hover:shadow-[0_22px_44px_#00b7c818]"
     >
-      <div className="relative aspect-[8/5] overflow-hidden bg-sand">
+      <div
+        className="relative aspect-[8/5] overflow-hidden bg-sand"
+        style={{ touchAction: images.length > 1 ? "pan-y" : undefined }}
+        onPointerDown={swipe.onPointerDown}
+        onPointerUp={swipe.onPointerUp}
+        onPointerCancel={swipe.onPointerCancel}
+      >
         <ProductImage
           src={current}
           alt={title}

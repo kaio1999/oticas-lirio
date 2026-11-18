@@ -16,13 +16,8 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="relative overflow-hidden">
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-[linear-gradient(165deg,#faf9f7_0%,#f3eee7_48%,#ebe4da_100%)] md:bg-[radial-gradient(ellipse_at_80%_20%,#00b7c81a_0%,transparent_42%),linear-gradient(165deg,#faf9f7_0%,#f3eee7_48%,#ebe4da_100%)]"
-        />
-
-        <div className="container-page relative z-10 grid items-center gap-10 py-10 md:min-h-[min(78vh,760px)] md:py-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-14">
+      <section>
+        <div className="container-page grid items-center gap-10 py-10 md:min-h-[min(78vh,760px)] md:py-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-14">
           <div>
             <div className="flex items-center gap-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
